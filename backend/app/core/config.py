@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # Configuración de CORS para React frontend
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:3000",  # React dev server
+        "http://localhost:5173",
         "http://frontend:3000",   # Docker container name
     ]
     
