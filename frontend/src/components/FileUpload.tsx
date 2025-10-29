@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useFileStore } from '@/stores/fileStore'
 import { api } from '@/services/api'
@@ -19,6 +19,12 @@ export function FileUpload({ open, onOpenChange, onSuccess }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [tema, setTema] = useState(selectedTema || '')
   const [uploading, setUploading] = useState(false)
+
+    useEffect(() => {
+    if (open && selectedTema) {
+      setTema(selectedTema)
+    }
+  }, [open, selectedTema])
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(prev => [...prev, ...acceptedFiles])
@@ -66,10 +72,9 @@ export function FileUpload({ open, onOpenChange, onSuccess }: FileUploadProps) {
       setTema('')
       onOpenChange(false)
       
-      // Aquí deberías recargar la lista de archivos
+      // recargar la lista de archivos
       onSuccess?.()
       
-      // Puedes agregar una función en el store para esto
       
     } catch (error) {
       console.error('Error uploading files:', error)

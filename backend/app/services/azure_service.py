@@ -1,8 +1,8 @@
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, generate_blob_sas, BlobSasPermissions
 from azure.core.exceptions import ResourceNotFoundError, ResourceExistsError
 from typing import List, Optional, BinaryIO
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import os
 from ..core.config import settings
 
@@ -22,9 +22,40 @@ class AzureBlobService:
             )
             self.container_name = settings.AZURE_CONTAINER_NAME
             logger.info(f"Cliente de Azure Blob Storage inicializado para container: {self.container_name}")
+
+            # Configurar CORS automáticamente al inicializar
+            self._configure_cors()
         except Exception as e:
             logger.error(f"Error inicializando Azure Blob Service: {e}")
             raise e
+
+    def _configure_cors(self):
+        """
+        Configurar CORS en Azure Blob Storage para permitir acceso desde el frontend
+
+        Esto es necesario para que el navegador pueda cargar PDFs directamente
+        desde Azure usando las URLs SAS generadas.
+        """
+        try:
+            from azure.storage.blob import CorsRule
+
+            # Definir regla CORS permisiva para desarrollo y producción
+            cors_rule = CorsRule(
+                allowed_origins=["*"],  # En producción, especificar dominios exactos
+                allowed_methods=["GET", "HEAD", "OPTIONS"],
+                allowed_headers=["*"],
+                exposed_headers=["*"],
+                max_age_in_seconds=3600
+            )
+
+            # Aplicar la configuración CORS
+            self.blob_service_client.set_service_properties(cors=[cors_rule])
+            logger.info("CORS configurado exitosamente en Azure Blob Storage")
+
+        except Exception as e:
+            # No fallar si CORS no se puede configurar (puede que ya esté configurado)
+            logger.warning(f"No se pudo configurar CORS automáticamente: {e}")
+            logger.warning("Asegúrate de configurar CORS manualmente en Azure Portal si es necesario")
     
     async def create_container_if_not_exists(self) -> bool:
         """
@@ -237,28 +268,110 @@ class AzureBlobService:
     async def get_download_url(self, blob_name: str, tema: str = "") -> str:
         """
         Obtener URL de descarga directa para un archivo
-        
+
         Args:
             blob_name: Nombre del archivo
             tema: Tema/carpeta donde está el archivo
-        
+
         Returns:
             str: URL de descarga
         """
         try:
             # Construir la ruta completa
             full_blob_name = f"{tema}/{blob_name}" if tema else blob_name
-            
+
             # Obtener cliente del blob
             blob_client = self.blob_service_client.get_blob_client(
                 container=self.container_name,
                 blob=full_blob_name
             )
-            
+
             return blob_client.url
-            
+
         except Exception as e:
             logger.error(f"Error obteniendo URL de descarga para '{blob_name}': {e}")
+            raise e
+
+    async def generate_sas_url(self, blob_name: str, tema: str = "", expiry_hours: int = 1) -> str:
+        """
+        Generar una URL SAS (Shared Access Signature) temporal para acceder a un archivo
+
+        Esta URL permite acceso temporal y seguro al archivo sin requerir autenticación.
+        Es ideal para vistas previas de archivos en el navegador.
+
+        Args:
+            blob_name: Nombre del archivo
+            tema: Tema/carpeta donde está el archivo
+            expiry_hours: Horas de validez de la URL (por defecto 1 hora)
+
+        Returns:
+            str: URL completa con SAS token para acceso temporal
+        """
+        try:
+            from azure.storage.blob import ContentSettings
+
+            # Construir la ruta completa del blob
+            full_blob_name = f"{tema}/{blob_name}" if tema else blob_name
+
+            # Obtener cliente del blob
+            blob_client = self.blob_service_client.get_blob_client(
+                container=self.container_name,
+                blob=full_blob_name
+            )
+
+            # Verificar que el archivo existe antes de generar el SAS
+            if not blob_client.exists():
+                raise FileNotFoundError(f"El archivo '{blob_name}' no existe")
+
+            # IMPORTANTE: Configurar el blob para que se muestre inline (no descarga)
+            # Esto hace que el navegador muestre el PDF en lugar de descargarlo
+            try:
+                content_settings = ContentSettings(
+                    content_type='application/pdf',
+                    content_disposition='inline'  # Clave para mostrar en navegador
+                )
+                blob_client.set_http_headers(content_settings=content_settings)
+                logger.info(f"Headers configurados para visualización inline de '{full_blob_name}'")
+            except Exception as e:
+                logger.warning(f"No se pudieron configurar headers inline: {e}")
+
+            # Definir el tiempo de expiración del SAS token
+            start_time = datetime.now(timezone.utc)
+            expiry_time = start_time + timedelta(hours=expiry_hours)
+
+            # Extraer la account key del connection string para generar el SAS
+            # El SAS necesita la account key para firmar el token
+            account_key = None
+            for part in settings.AZURE_STORAGE_CONNECTION_STRING.split(';'):
+                if part.startswith('AccountKey='):
+                    account_key = part.split('=', 1)[1]
+                    break
+
+            if not account_key:
+                raise ValueError("No se pudo extraer AccountKey del connection string")
+
+            # Generar el SAS token con permisos de solo lectura
+            sas_token = generate_blob_sas(
+                account_name=blob_client.account_name,
+                container_name=self.container_name,
+                blob_name=full_blob_name,
+                account_key=account_key,
+                permission=BlobSasPermissions(read=True),  # Solo permisos de lectura
+                expiry=expiry_time,
+                start=start_time
+            )
+
+            # Construir la URL completa con el SAS token
+            sas_url = f"{blob_client.url}?{sas_token}"
+
+            logger.info(f"SAS URL generada para '{full_blob_name}' (válida por {expiry_hours} horas)")
+            return sas_url
+
+        except FileNotFoundError:
+            logger.error(f"Archivo '{full_blob_name}' no encontrado para generar SAS")
+            raise
+        except Exception as e:
+            logger.error(f"Error generando SAS URL para '{blob_name}': {e}")
             raise e
 
 

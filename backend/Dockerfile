@@ -19,4 +19,5 @@ RUN uv sync --frozen
 EXPOSE 8000
 
 # Comando para desarrollo (con reload)
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Reinstalar dependencias al inicio para asegurar compatibilidad con volumen montado
+CMD ["sh", "-c", "uv sync --frozen && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]

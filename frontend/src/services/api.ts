@@ -159,20 +159,33 @@ export const api = {
   downloadTema: async (tema: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/files/tema/${encodeURIComponent(tema)}/download-all`)
     if (!response.ok) throw new Error('Error downloading tema')
-    
+
     const blob = await response.blob()
     const downloadUrl = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = downloadUrl
-    
+
     const contentDisposition = response.headers.get('Content-Disposition')
     const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || `${tema}.zip`
-    
+
     link.download = filename
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(downloadUrl)
+  },
+
+  // Obtener URL temporal para preview de archivos
+  getPreviewUrl: async (filename: string, tema?: string): Promise<string> => {
+    const url = tema
+      ? `${API_BASE_URL}/files/${encodeURIComponent(filename)}/preview-url?tema=${encodeURIComponent(tema)}`
+      : `${API_BASE_URL}/files/${encodeURIComponent(filename)}/preview-url`
+
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Error getting preview URL')
+
+    const data = await response.json()
+    return data.url
   },
 
 }

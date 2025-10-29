@@ -3,22 +3,23 @@ import { useFileStore } from '@/stores/fileStore'
 import { api } from '@/services/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FileUpload } from './FileUpload'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
-import { 
-  Upload, 
-  Download, 
-  Trash2, 
-  Search, 
+import { PDFPreviewModal } from './PDFPreviewModal'
+import {
+  Upload,
+  Download,
+  Trash2,
+  Search,
   FileText,
   Eye,
   MessageSquare
@@ -43,6 +44,13 @@ export function Dashboard() {
   const [fileToDelete, setFileToDelete] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [downloading, setDownloading] = useState(false)
+
+  // Estados para el modal de preview de PDF
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null)
+  const [previewFileName, setPreviewFileName] = useState('')
+  const [previewFileTema, setPreviewFileTema] = useState<string | undefined>(undefined)
+  const [loadingPreview, setLoadingPreview] = useState(false)
 
   useEffect(() => {
     loadFiles()
@@ -119,7 +127,7 @@ export function Dashboard() {
   // Descargar archivos seleccionados
   const handleDownloadMultiple = async () => {
     if (selectedFiles.size === 0) return
-    
+
     try {
       setDownloading(true)
       const filesToDownload = Array.from(selectedFiles)
@@ -129,6 +137,39 @@ export function Dashboard() {
       console.error('Error downloading files:', error)
     } finally {
       setDownloading(false)
+    }
+  }
+
+  // Abrir preview de PDF
+  const handlePreviewFile = async (filename: string, tema?: string) => {
+    // Solo permitir preview de archivos PDF
+    if (!filename.toLowerCase().endsWith('.pdf')) {
+      console.log('Solo se pueden previsualizar archivos PDF')
+      return
+    }
+
+    try {
+      setLoadingPreview(true)
+      setPreviewFileName(filename)
+      setPreviewFileTema(tema)
+
+      // Obtener la URL temporal (SAS) para el archivo
+      const url = await api.getPreviewUrl(filename, tema)
+
+      setPreviewFileUrl(url)
+      setPreviewModalOpen(true)
+    } catch (error) {
+      console.error('Error obteniendo URL de preview:', error)
+      alert('Error al cargar la vista previa del archivo')
+    } finally {
+      setLoadingPreview(false)
+    }
+  }
+
+  // Manejar descarga desde el modal de preview
+  const handleDownloadFromPreview = async () => {
+    if (previewFileName) {
+      await handleDownloadSingle(previewFileName)
     }
   }
 
@@ -267,59 +308,75 @@ export function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredFiles.map((file) => (
-                <TableRow key={file.full_path}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedFiles.has(file.name)}
-                      onCheckedChange={() => toggleFileSelection(file.name)}
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{file.name}</TableCell>
-                  <TableCell>{formatFileSize(file.size)}</TableCell>
-                  <TableCell>{formatDate(file.last_modified)}</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 bg-gray-100 rounded-md text-sm">
-                      {file.tema || 'General'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleDownloadSingle(file.name)}
-                        disabled={downloading}
-                        title="Descargar archivo"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        title="Ver chunks"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        title="Generar preguntas"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleDeleteSingle(file.name)}
-                        title="Eliminar archivo"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredFiles.map((file) => {
+                const isPDF = file.name.toLowerCase().endsWith('.pdf')
+
+                return (
+                  <TableRow key={file.full_path}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedFiles.has(file.name)}
+                        onCheckedChange={() => toggleFileSelection(file.name)}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {isPDF ? (
+                        <button
+                          onClick={() => handlePreviewFile(file.name, file.tema || undefined)}
+                          className="text-blue-600 hover:text-blue-800 hover:underline text-left transition-colors"
+                          disabled={loadingPreview}
+                        >
+                          {file.name}
+                        </button>
+                      ) : (
+                        <span>{file.name}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{formatFileSize(file.size)}</TableCell>
+                    <TableCell>{formatDate(file.last_modified)}</TableCell>
+                    <TableCell>
+                      <span className="px-2 py-1 bg-gray-100 rounded-md text-sm">
+                        {file.tema || 'General'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadSingle(file.name)}
+                          disabled={downloading}
+                          title="Descargar archivo"
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Ver chunks"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Generar preguntas"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteSingle(file.name)}
+                          title="Eliminar archivo"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         )}
@@ -339,6 +396,15 @@ export function Dashboard() {
         onConfirm={confirmDelete}
         loading={deleting}
         {...getDeleteDialogProps()}
+      />
+
+      {/* PDF Preview Modal */}
+      <PDFPreviewModal
+        open={previewModalOpen}
+        onOpenChange={setPreviewModalOpen}
+        fileUrl={previewFileUrl}
+        fileName={previewFileName}
+        onDownload={handleDownloadFromPreview}
       />
     </div>
   )

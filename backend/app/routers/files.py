@@ -582,7 +582,7 @@ async def get_file_info(
             blob_name=filename,
             tema=tema or ""
         )
-        
+
         # Convertir a objeto FileInfo
         file_info = FileInfo(
             name=file_data["name"],
@@ -593,12 +593,63 @@ async def get_file_info(
             content_type=file_data.get("content_type"),
             url=file_data.get("url")
         )
-        
+
         logger.info(f"Información obtenida para archivo '{filename}'")
         return file_info
-        
+
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Archivo '{filename}' no encontrado")
     except Exception as e:
         logger.error(f"Error obteniendo info del archivo '{filename}': {e}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+
+@router.get("/{filename}/preview-url")
+async def get_file_preview_url(
+    filename: str,
+    tema: Optional[str] = Query(None, description="Tema donde está el archivo"),
+    expiry_hours: int = Query(1, description="Horas de validez de la URL (máximo 24)", ge=1, le=24)
+):
+    """
+    Generar una URL temporal (SAS) para vista previa de archivos
+
+    Este endpoint genera una URL con firma temporal (Shared Access Signature)
+    que permite acceder al archivo directamente desde el navegador sin autenticación.
+    La URL expira después del tiempo especificado por seguridad.
+
+    Casos de uso:
+    - Vista previa de PDFs en el navegador
+    - Mostrar imágenes sin descargarlas
+    - Compartir acceso temporal a archivos
+
+    Args:
+        filename: Nombre del archivo
+        tema: Tema donde está ubicado el archivo (opcional)
+        expiry_hours: Horas de validez de la URL (1-24 horas, por defecto 1)
+
+    Returns:
+        JSON con la URL temporal del archivo
+    """
+    try:
+        # Generar SAS URL usando el servicio de Azure
+        sas_url = await azure_service.generate_sas_url(
+            blob_name=filename,
+            tema=tema or "",
+            expiry_hours=expiry_hours
+        )
+
+        logger.info(f"SAS URL generada para preview de '{filename}'" + (f" del tema '{tema}'" if tema else ""))
+
+        return {
+            "success": True,
+            "filename": filename,
+            "url": sas_url,
+            "expiry_hours": expiry_hours,
+            "message": f"URL temporal generada (válida por {expiry_hours} hora{'s' if expiry_hours > 1 else ''})"
+        }
+
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Archivo '{filename}' no encontrado")
+    except Exception as e:
+        logger.error(f"Error generando preview URL para '{filename}': {e}")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
