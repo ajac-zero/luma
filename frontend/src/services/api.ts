@@ -188,4 +188,236 @@ export const api = {
     return data.url
   },
 
+  // ============================================================================
+  // Vector Database / Qdrant Operations
+  // ============================================================================
+
+  // Health check de la base de datos vectorial
+  vectorHealthCheck: async (): Promise<{ status: string; db_type: string; message: string }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/health`)
+    if (!response.ok) throw new Error('Error checking vector DB health')
+    return response.json()
+  },
+
+  // Verificar si una colección existe
+  checkCollectionExists: async (collectionName: string): Promise<{ exists: boolean; collection_name: string }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/collections/exists`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ collection_name: collectionName }),
+    })
+    if (!response.ok) throw new Error('Error checking collection')
+    return response.json()
+  },
+
+  // Crear una nueva colección
+  createCollection: async (
+    collectionName: string,
+    vectorSize: number = 3072,
+    distance: string = 'Cosine'
+  ): Promise<{ success: boolean; collection_name: string; message: string }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/collections/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        collection_name: collectionName,
+        vector_size: vectorSize,
+        distance: distance,
+      }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Error creating collection')
+    }
+    return response.json()
+  },
+
+  // Eliminar una colección
+  deleteCollection: async (collectionName: string): Promise<{ success: boolean; collection_name: string; message: string }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/collections/${encodeURIComponent(collectionName)}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) throw new Error('Error deleting collection')
+    return response.json()
+  },
+
+  // Obtener información de una colección
+  getCollectionInfo: async (collectionName: string): Promise<{
+    name: string
+    vectors_count: number
+    vectors_config: { size: number; distance: string }
+    status: string
+  }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/collections/${encodeURIComponent(collectionName)}/info`)
+    if (!response.ok) throw new Error('Error getting collection info')
+    return response.json()
+  },
+
+  // Verificar si un archivo existe en una colección
+  checkFileExistsInCollection: async (
+    collectionName: string,
+    fileName: string
+  ): Promise<{ exists: boolean; collection_name: string; file_name: string; chunk_count?: number }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/files/exists`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        collection_name: collectionName,
+        file_name: fileName,
+      }),
+    })
+    if (!response.ok) throw new Error('Error checking file in collection')
+    return response.json()
+  },
+
+  // Obtener chunks de un archivo
+  getChunksByFile: async (
+    collectionName: string,
+    fileName: string,
+    limit?: number
+  ): Promise<{
+    collection_name: string
+    file_name: string
+    chunks: Array<{ id: string; payload: any; vector?: number[] }>
+    total_chunks: number
+  }> => {
+    const url = limit
+      ? `${API_BASE_URL}/vectors/collections/${encodeURIComponent(collectionName)}/files/${encodeURIComponent(fileName)}/chunks?limit=${limit}`
+      : `${API_BASE_URL}/vectors/collections/${encodeURIComponent(collectionName)}/files/${encodeURIComponent(fileName)}/chunks`
+
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Error getting chunks')
+    return response.json()
+  },
+
+  // Eliminar archivo de colección
+  deleteFileFromCollection: async (
+    collectionName: string,
+    fileName: string
+  ): Promise<{ success: boolean; collection_name: string; file_name: string; chunks_deleted: number; message: string }> => {
+    const response = await fetch(
+      `${API_BASE_URL}/vectors/collections/${encodeURIComponent(collectionName)}/files/${encodeURIComponent(fileName)}`,
+      { method: 'DELETE' }
+    )
+    if (!response.ok) throw new Error('Error deleting file from collection')
+    return response.json()
+  },
+
+  // Agregar chunks a una colección
+  addChunks: async (
+    collectionName: string,
+    chunks: Array<{ id: string; vector: number[]; payload: any }>
+  ): Promise<{ success: boolean; collection_name: string; chunks_added: number; message: string }> => {
+    const response = await fetch(`${API_BASE_URL}/vectors/chunks/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        collection_name: collectionName,
+        chunks: chunks,
+      }),
+    })
+    if (!response.ok) throw new Error('Error adding chunks')
+    return response.json()
+  },
+
+  // ============================================================================
+  // Chunking Operations
+  // ============================================================================
+
+  // Obtener perfiles de chunking predefinidos
+  getChunkingProfiles: async (): Promise<{
+    profiles: Array<{
+      id: string
+      name: string
+      description: string
+      max_tokens: number
+      target_tokens: number
+      chunk_size: number
+      chunk_overlap: number
+      use_llm: boolean
+    }>
+  }> => {
+    const response = await fetch(`${API_BASE_URL}/chunking/profiles`)
+    if (!response.ok) throw new Error('Error fetching chunking profiles')
+    return response.json()
+  },
+
+  // Generar preview de chunks (hasta 3 chunks)
+  generateChunkPreview: async (config: {
+    file_name: string
+    tema: string
+    max_tokens?: number
+    target_tokens?: number
+    chunk_size?: number
+    chunk_overlap?: number
+    use_llm?: boolean
+    custom_instructions?: string
+  }): Promise<{
+    success: boolean
+    file_name: string
+    tema: string
+    chunks: Array<{
+      index: number
+      text: string
+      page: number
+      file_name: string
+      tokens: number
+    }>
+    message: string
+  }> => {
+    const response = await fetch(`${API_BASE_URL}/chunking/preview`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Error generating preview')
+    }
+    return response.json()
+  },
+
+  // Procesar PDF completo
+  processChunkingFull: async (config: {
+    file_name: string
+    tema: string
+    collection_name: string
+    max_tokens?: number
+    target_tokens?: number
+    chunk_size?: number
+    chunk_overlap?: number
+    use_llm?: boolean
+    custom_instructions?: string
+  }): Promise<{
+    success: boolean
+    collection_name: string
+    file_name: string
+    total_chunks: number
+    chunks_added: number
+    message: string
+  }> => {
+    const response = await fetch(`${API_BASE_URL}/chunking/process`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Error processing PDF')
+    }
+    return response.json()
+  },
+
 }

@@ -15,6 +15,10 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { FileUpload } from './FileUpload'
 import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { PDFPreviewModal } from './PDFPreviewModal'
+import { CollectionVerifier } from './CollectionVerifier'
+import { ChunkViewerModal } from './ChunkViewerModal'
+import { ChunkingConfigModal, type ChunkingConfig } from './ChunkingConfigModal'
+import { ChunkPreviewPanel } from './ChunkPreviewPanel'
 import {
   Upload,
   Download,
@@ -22,7 +26,8 @@ import {
   Search,
   FileText,
   Eye,
-  MessageSquare
+  MessageSquare,
+  Scissors
 } from 'lucide-react'
 
 export function Dashboard() {
@@ -51,6 +56,20 @@ export function Dashboard() {
   const [previewFileName, setPreviewFileName] = useState('')
   const [previewFileTema, setPreviewFileTema] = useState<string | undefined>(undefined)
   const [loadingPreview, setLoadingPreview] = useState(false)
+
+  // Estados para el modal de chunks
+  const [chunkViewerOpen, setChunkViewerOpen] = useState(false)
+  const [chunkFileName, setChunkFileName] = useState('')
+  const [chunkFileTema, setChunkFileTema] = useState('')
+
+  // Estados para chunking
+  const [chunkingConfigOpen, setChunkingConfigOpen] = useState(false)
+  const [chunkingFileName, setChunkingFileName] = useState('')
+  const [chunkingFileTema, setChunkingFileTema] = useState('')
+  const [chunkingCollectionName, setChunkingCollectionName] = useState('')
+
+  const [chunkPreviewOpen, setChunkPreviewOpen] = useState(false)
+  const [chunkingConfig, setChunkingConfig] = useState<ChunkingConfig | null>(null)
 
   useEffect(() => {
     loadFiles()
@@ -171,6 +190,54 @@ export function Dashboard() {
     if (previewFileName) {
       await handleDownloadSingle(previewFileName)
     }
+  }
+
+  // Abrir modal de chunks
+  const handleViewChunks = (filename: string, tema: string) => {
+    if (!tema) {
+      alert('No hay tema seleccionado. Por favor selecciona un tema primero.')
+      return
+    }
+    setChunkFileName(filename)
+    setChunkFileTema(tema)
+    setChunkViewerOpen(true)
+  }
+
+  // Handlers para chunking
+  const handleStartChunking = (filename: string, tema: string) => {
+    if (!tema) {
+      alert('No hay tema seleccionado. Por favor selecciona un tema primero.')
+      return
+    }
+    setChunkingFileName(filename)
+    setChunkingFileTema(tema)
+    setChunkingCollectionName(tema) // Usar el tema como nombre de colección
+    setChunkingConfigOpen(true)
+  }
+
+  const handlePreviewChunking = (config: ChunkingConfig) => {
+    setChunkingConfig(config)
+    setChunkingConfigOpen(false)
+    setChunkPreviewOpen(true)
+  }
+
+  const handleAcceptChunking = async (config: ChunkingConfig) => {
+    try {
+      const result = await api.processChunkingFull(config)
+      alert(`Procesamiento completado: ${result.chunks_added} chunks agregados a ${result.collection_name}`)
+      // Recargar archivos para actualizar el estado
+      loadFiles()
+    } catch (error) {
+      console.error('Error processing PDF:', error)
+      throw error
+    }
+  }
+
+  const handleCancelChunking = () => {
+    setChunkPreviewOpen(false)
+    setChunkingConfig(null)
+    // Opcionalmente volver al modal de configuración
+    // setChunkingConfigOpen(true)
   }
 
   const filteredFiles = files.filter(file =>
@@ -353,7 +420,16 @@ export function Dashboard() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          title="Procesar con chunking"
+                          onClick={() => handleStartChunking(file.name, file.tema)}
+                        >
+                          <Scissors className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           title="Ver chunks"
+                          onClick={() => handleViewChunks(file.name, file.tema)}
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -405,6 +481,41 @@ export function Dashboard() {
         fileUrl={previewFileUrl}
         fileName={previewFileName}
         onDownload={handleDownloadFromPreview}
+      />
+
+      {/* Collection Verifier - Verifica/crea colección cuando se selecciona un tema */}
+      <CollectionVerifier
+        tema={selectedTema}
+        onVerified={(exists) => {
+          console.log(`Collection ${selectedTema} exists: ${exists}`)
+        }}
+      />
+
+      {/* Chunk Viewer Modal */}
+      <ChunkViewerModal
+        isOpen={chunkViewerOpen}
+        onClose={() => setChunkViewerOpen(false)}
+        fileName={chunkFileName}
+        tema={chunkFileTema}
+      />
+
+      {/* Modal de configuración de chunking */}
+      <ChunkingConfigModal
+        isOpen={chunkingConfigOpen}
+        onClose={() => setChunkingConfigOpen(false)}
+        fileName={chunkingFileName}
+        tema={chunkingFileTema}
+        collectionName={chunkingCollectionName}
+        onPreview={handlePreviewChunking}
+      />
+
+      {/* Panel de preview de chunks */}
+      <ChunkPreviewPanel
+        isOpen={chunkPreviewOpen}
+        onClose={() => setChunkPreviewOpen(false)}
+        config={chunkingConfig}
+        onAccept={handleAcceptChunking}
+        onCancel={handleCancelChunking}
       />
     </div>
   )

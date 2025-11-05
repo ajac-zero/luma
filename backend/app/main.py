@@ -6,6 +6,8 @@ import logging
 
 # Import routers
 from .routers.files import router as files_router
+from .routers.vectors import router as vectors_router
+from .routers.chunking import router as chunking_router
 from .core.config import settings
 # from routers.ai import router as ai_router  #  futuro con Azure OpenAI
 
@@ -98,6 +100,18 @@ app.include_router(
     tags=["files"]
 )
 
+app.include_router(
+    vectors_router,
+    prefix="/api/v1",
+    tags=["vectors"]
+)
+
+app.include_router(
+    chunking_router,
+    prefix="/api/v1",
+    tags=["chunking"]
+)
+
 # Router para IA
 # app.include_router(
 #     ai_router,
@@ -110,6 +124,7 @@ app.include_router(
 async def startup_event():
     logger.info("Iniciando File Manager API...")
     logger.info(f"Conectando a Azure Storage Account: {settings.AZURE_STORAGE_ACCOUNT_NAME}")
+    logger.info(f"Conectando a Qdrant: {settings.QDRANT_URL}")
     #  validaciones de conexión a Azure
     
 
