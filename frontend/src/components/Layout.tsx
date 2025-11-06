@@ -5,11 +5,13 @@ import { Menu } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { Dashboard } from './Dashboard'
 import { SchemaManagement } from '@/pages/SchemaManagement'
+import { cn } from '@/lib/utils'
 
 type View = 'dashboard' | 'schemas'
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [currentView, setCurrentView] = useState<View>('dashboard')
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -33,19 +35,37 @@ export function Layout() {
   return (
     <div className="h-screen flex bg-gray-50">
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col">
-        <Sidebar onNavigateToSchemas={handleNavigateToSchemas} disabled={isProcessing} />
+      <div
+        className={cn(
+          'hidden md:flex md:flex-col transition-all duration-300',
+          isSidebarCollapsed ? 'md:w-20' : 'md:w-64'
+        )}
+      >
+        <Sidebar
+          onNavigateToSchemas={handleNavigateToSchemas}
+          disabled={isProcessing}
+          collapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-40" disabled={isProcessing}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden fixed top-4 left-4 z-40"
+            disabled={isProcessing}
+          >
             <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-64 p-0">
-          <Sidebar onNavigateToSchemas={handleNavigateToSchemas} disabled={isProcessing} />
+          <Sidebar
+            onNavigateToSchemas={handleNavigateToSchemas}
+            disabled={isProcessing}
+          />
         </SheetContent>
       </Sheet>
 
