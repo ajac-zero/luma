@@ -8,6 +8,8 @@ import logging
 from .routers.files import router as files_router
 from .routers.vectors import router as vectors_router
 from .routers.chunking import router as chunking_router
+from .routers.schemas import router as schemas_router
+from .routers.chunking_landingai import router as chunking_landingai_router
 from .core.config import settings
 # from routers.ai import router as ai_router  #  futuro con Azure OpenAI
 
@@ -111,6 +113,12 @@ app.include_router(
     prefix="/api/v1",
     tags=["chunking"]
 )
+
+# Schemas router (nuevo)
+app.include_router(schemas_router)
+
+# Chunking LandingAI router (nuevo)
+app.include_router(chunking_landingai_router)
 
 # Router para IA
 # app.include_router(

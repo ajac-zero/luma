@@ -420,4 +420,96 @@ export const api = {
     return response.json()
   },
 
+  // ============================================================================
+  // Schemas API
+  // ============================================================================
+
+  // Crear schema
+  createSchema: async (schema: any): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/schemas/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(schema)
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail?.message || 'Error creando schema')
+    }
+    return response.json()
+  },
+
+  // Listar schemas
+  listSchemas: async (tema?: string): Promise<any[]> => {
+    const url = tema
+      ? `${API_BASE_URL}/schemas/?tema=${encodeURIComponent(tema)}`
+      : `${API_BASE_URL}/schemas/`
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Error listando schemas')
+    return response.json()
+  },
+
+  // Obtener schema por ID
+  getSchema: async (schema_id: string): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/schemas/${schema_id}`)
+    if (!response.ok) throw new Error('Error obteniendo schema')
+    return response.json()
+  },
+
+  // Actualizar schema
+  updateSchema: async (schema_id: string, schema: any): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/schemas/${schema_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(schema)
+    })
+    if (!response.ok) throw new Error('Error actualizando schema')
+    return response.json()
+  },
+
+  // Eliminar schema
+  deleteSchema: async (schema_id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/schemas/${schema_id}`, {
+      method: 'DELETE'
+    })
+    if (!response.ok) throw new Error('Error eliminando schema')
+  },
+
+  // Validar schema
+  validateSchema: async (schema: any): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/schemas/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(schema)
+    })
+    if (!response.ok) throw new Error('Error validando schema')
+    return response.json()
+  },
+
+  // ============================================================================
+  // LandingAI Processing
+  // ============================================================================
+
+  // Procesar con LandingAI
+  processWithLandingAI: async (config: {
+    file_name: string
+    tema: string
+    collection_name: string
+    mode: 'quick' | 'extract'
+    schema_id?: string
+    include_chunk_types?: string[]
+    max_tokens_per_chunk?: number
+    merge_small_chunks?: boolean
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/chunking-landingai/process`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Error procesando con LandingAI')
+    }
+    return response.json()
+  },
+
 }

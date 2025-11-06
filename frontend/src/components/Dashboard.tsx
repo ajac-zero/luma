@@ -17,8 +17,7 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog'
 import { PDFPreviewModal } from './PDFPreviewModal'
 import { CollectionVerifier } from './CollectionVerifier'
 import { ChunkViewerModal } from './ChunkViewerModal'
-import { ChunkingConfigModal, type ChunkingConfig } from './ChunkingConfigModal'
-import { ChunkPreviewPanel } from './ChunkPreviewPanel'
+import { ChunkingConfigModalLandingAI, type LandingAIConfig } from './ChunkingConfigModalLandingAI'
 import {
   Upload,
   Download,
@@ -30,7 +29,11 @@ import {
   Scissors
 } from 'lucide-react'
 
-export function Dashboard() {
+interface DashboardProps {
+  onProcessingChange?: (isProcessing: boolean) => void
+}
+
+export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
   const {
     selectedTema,
     files,
@@ -67,9 +70,7 @@ export function Dashboard() {
   const [chunkingFileName, setChunkingFileName] = useState('')
   const [chunkingFileTema, setChunkingFileTema] = useState('')
   const [chunkingCollectionName, setChunkingCollectionName] = useState('')
-
-  const [chunkPreviewOpen, setChunkPreviewOpen] = useState(false)
-  const [chunkingConfig, setChunkingConfig] = useState<ChunkingConfig | null>(null)
+  const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
     loadFiles()
@@ -215,29 +216,41 @@ export function Dashboard() {
     setChunkingConfigOpen(true)
   }
 
-  const handlePreviewChunking = (config: ChunkingConfig) => {
-    setChunkingConfig(config)
+  const handleProcessWithLandingAI = async (config: LandingAIConfig) => {
+    setProcessing(true)
+    onProcessingChange?.(true)
     setChunkingConfigOpen(false)
-    setChunkPreviewOpen(true)
-  }
 
-  const handleAcceptChunking = async (config: ChunkingConfig) => {
     try {
-      const result = await api.processChunkingFull(config)
-      alert(`Procesamiento completado: ${result.chunks_added} chunks agregados a ${result.collection_name}`)
-      // Recargar archivos para actualizar el estado
-      loadFiles()
-    } catch (error) {
-      console.error('Error processing PDF:', error)
-      throw error
-    }
-  }
+      const result = await api.processWithLandingAI(config)
 
-  const handleCancelChunking = () => {
-    setChunkPreviewOpen(false)
-    setChunkingConfig(null)
-    // Opcionalmente volver al modal de configuración
-    // setChunkingConfigOpen(true)
+      // Mensaje  detallado
+      let message = `Completado\n\n`
+      message += `• Modo: ${result.mode === 'quick' ? 'Rápido' : 'Con Extracción'}\n`
+      message += `• Chunks procesados: ${result.total_chunks}\n`
+      message += `• Chunks agregados: ${result.chunks_added}\n`
+      message += `• Colección: ${result.collection_name}\n`
+      message += `• Tiempo: ${result.processing_time_seconds}s\n`
+
+      if (result.schema_used) {
+        message += `• Schema usado: ${result.schema_used}\n`
+      }
+
+      if (result.extracted_data) {
+        message += `\nDatos extraídos disponibles en metadata`
+      }
+
+      alert(message)
+
+      // Recargar archivos
+      loadFiles()
+    } catch (error: any) {
+      console.error('Error processing with LandingAI:', error)
+      alert(`❌ Error: ${error.message}`)
+    } finally {
+      setProcessing(false)
+      onProcessingChange?.(false)
+    }
   }
 
   const filteredFiles = files.filter(file =>
@@ -282,6 +295,18 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-full bg-white">
+      {/* Processing Banner */}
+      {processing && (
+        <div className="bg-blue-50 border-b border-blue-200 px-6 py-3">
+          <div className="flex items-center justify-center gap-3">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <p className="text-sm font-medium text-blue-900">
+              Procesando archivo con LandingAI... Por favor no navegues ni realices otras acciones.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -295,7 +320,7 @@ export function Dashboard() {
           </div>
           
           <div className="flex gap-2">
-            <Button onClick={() => setUploadDialogOpen(true)}>
+            <Button onClick={() => setUploadDialogOpen(true)} disabled={processing}>
               <Upload className="w-4 h-4 mr-2" />
               Subir archivo
             </Button>
@@ -311,24 +336,26 @@ export function Dashboard() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
+              disabled={processing}
             />
           </div>
 
           {selectedFiles.size > 0 && (
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleDownloadMultiple}
-                disabled={downloading}
+                disabled={downloading || processing}
               >
                 <Download className="w-4 h-4 mr-2" />
                 {downloading ? 'Descargando...' : `Descargar (${selectedFiles.size})`}
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleDeleteMultiple}
+                disabled={processing}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Eliminar ({selectedFiles.size})
@@ -358,7 +385,7 @@ export function Dashboard() {
                 <TableHead className="w-12">
                   <Checkbox
                     checked={selectedFiles.size === filteredFiles.length && filteredFiles.length > 0}
-                    onCheckedChange={(checked) => {
+                    onCheckedChange={(checked: boolean) => {
                       if (checked) {
                         selectAllFiles()
                       } else {
@@ -499,23 +526,14 @@ export function Dashboard() {
         tema={chunkFileTema}
       />
 
-      {/* Modal de configuración de chunking */}
-      <ChunkingConfigModal
+      {/* Modal de configuración de chunking con LandingAI */}
+      <ChunkingConfigModalLandingAI
         isOpen={chunkingConfigOpen}
         onClose={() => setChunkingConfigOpen(false)}
         fileName={chunkingFileName}
         tema={chunkingFileTema}
         collectionName={chunkingCollectionName}
-        onPreview={handlePreviewChunking}
-      />
-
-      {/* Panel de preview de chunks */}
-      <ChunkPreviewPanel
-        isOpen={chunkPreviewOpen}
-        onClose={() => setChunkPreviewOpen(false)}
-        config={chunkingConfig}
-        onAccept={handleAcceptChunking}
-        onCancel={handleCancelChunking}
+        onProcess={handleProcessWithLandingAI}
       />
     </div>
   )

@@ -67,6 +67,7 @@ dependencies = [
     { name = "azure-storage-blob" },
     { name = "fastapi" },
     { name = "google-cloud-aiplatform" },
+    { name = "landingai-ade" },
     { name = "langchain" },
     { name = "langchain-core" },
     { name = "langchain-text-splitters" },
@@ -88,6 +89,7 @@ requires-dist = [
     { name = "azure-storage-blob", specifier = ">=12.26.0" },
     { name = "fastapi", specifier = ">=0.116.1" },
     { name = "google-cloud-aiplatform", specifier = ">=1.77.0" },
+    { name = "landingai-ade", specifier = ">=0.2.1" },
     { name = "langchain", specifier = ">=0.3.12" },
     { name = "langchain-core", specifier = ">=0.3.24" },
     { name = "langchain-text-splitters", specifier = ">=1.0.0" },
@@ -808,6 +810,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6a/0a/eebeb1fa92507ea94016a2a790b93c2ae41a7e18778f85471dc54475ed25/jsonpointer-3.0.0.tar.gz", hash = "sha256:2b2d729f2091522d61c3b31f82e11870f60b68f43fbc705cb76bf4b832af59ef", size = 9114, upload-time = "2024-06-10T19:24:42.462Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/71/92/5e77f98553e9e75130c78900d000368476aed74276eb8ae8796f65f00918/jsonpointer-3.0.0-py2.py3-none-any.whl", hash = "sha256:13e088adc14fca8b6aa8177c044e12701e6ad4b28ff10e65f2267a90109c9942", size = 7595, upload-time = "2024-06-10T19:24:40.698Z" },
+]
+
+[[package]]
+name = "landingai-ade"
+version = "0.20.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/46/05/8e94b262625545683db8b0206929691715a0905c8227b776866885be7fb6/landingai_ade-0.20.3.tar.gz", hash = "sha256:8fd95fabdf3f72b5a1c0d0b3b485631e41e1c25c6e5636de10fbec83078772d2", size = 107576, upload-time = "2025-11-05T02:03:46.808Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/49/d0/6daeb909475d2b49847ebb27d1093aa586154a1d910e9b14addb1b356007/landingai_ade-0.20.3-py3-none-any.whl", hash = "sha256:599a7ec1b31ca3923160c20037cef5f3afbf84485ce98b8ead028ac540d50bbd", size = 86222, upload-time = "2025-11-05T02:03:45.825Z" },
 ]
 
 [[package]]

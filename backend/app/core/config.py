@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     GOOGLE_CLOUD_LOCATION: str = "us-central1"
     GEMINI_MODEL: str = "gemini-2.0-flash"
 
+    # LandingAI configuración
+    LANDINGAI_API_KEY: str
+    LANDINGAI_ENVIRONMENT: str = "production"  # "production" o "eu"
+
+    # Schemas storage
+    SCHEMAS_DIR: str = "./data/schemas"
+
     @validator("AZURE_STORAGE_CONNECTION_STRING")
     def validate_azure_connection_string(cls, v):
         """Validar que el connection string de Azure esté presente"""
@@ -92,6 +99,13 @@ class Settings(BaseSettings):
         """Validar que el proyecto de Google Cloud esté presente"""
         if not v:
             raise ValueError("GOOGLE_CLOUD_PROJECT es requerido")
+        return v
+
+    @validator("LANDINGAI_API_KEY")
+    def validate_landingai_api_key(cls, v):
+        """Validar que la API key de LandingAI esté presente"""
+        if not v:
+            raise ValueError("LANDINGAI_API_KEY es requerido")
         return v
 
     class Config:
