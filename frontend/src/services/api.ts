@@ -56,17 +56,9 @@ export const api = {
 
   // Obtener todos los datarooms
   getDatarooms: async (): Promise<DataroomsResponse> => {
-    console.log("Fetching datarooms from:", `${API_BASE_URL}/dataroom/`);
     const response = await fetch(`${API_BASE_URL}/dataroom/`);
-    console.log("Datarooms response status:", response.status);
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Datarooms fetch error:", errorText);
-      throw new Error("Error fetching datarooms");
-    }
-    const data = await response.json();
-    console.log("Datarooms API response:", data);
-    return data;
+    if (!response.ok) throw new Error("Error fetching datarooms");
+    return response.json();
   },
 
   // Crear un nuevo dataroom

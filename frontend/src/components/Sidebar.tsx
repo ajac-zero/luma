@@ -92,14 +92,11 @@ export function Sidebar({
     setCreateError(null);
 
     try {
-      console.log("Creating dataroom:", trimmed);
       const result = await api.createDataroom({ name: trimmed });
-      console.log("Dataroom created successfully:", result);
 
       // Refresh the datarooms list (this will load all datarooms including the new one)
-      console.log("Refreshing dataroom list...");
+
       await loadTemas();
-      console.log("Dataroom list refreshed");
 
       // Select the newly created dataroom
       setSelectedTema(trimmed);
@@ -126,7 +123,6 @@ export function Sidebar({
     try {
       setLoading(true);
       const response = await api.getDatarooms();
-      console.log("Raw datarooms response:", response);
 
       // Extract dataroom names from the response with better error handling
       let dataroomNames: string[] = [];
@@ -137,18 +133,23 @@ export function Sidebar({
       }
 
       setTemas(dataroomNames);
-      console.log("Loaded datarooms:", dataroomNames);
+      // Auto-select first dataroom if none is selected and datarooms are available
+      if (!selectedTema && dataroomNames.length > 0) {
+        setSelectedTema(dataroomNames[0]);
+      }
     } catch (error) {
       console.error("Error loading datarooms:", error);
       // Fallback to legacy getTemas if dataroom endpoint fails
       try {
-        console.log("Falling back to legacy getTemas endpoint");
         const legacyResponse = await api.getTemas();
         const legacyTemas = Array.isArray(legacyResponse?.temas)
           ? legacyResponse.temas.filter(Boolean)
           : [];
         setTemas(legacyTemas);
-        console.log("Loaded legacy temas:", legacyTemas);
+        // Auto-select first legacy tema if none is selected
+        if (!selectedTema && legacyTemas.length > 0) {
+          setSelectedTema(legacyTemas[0]);
+        }
       } catch (legacyError) {
         console.error("Error loading legacy temas:", legacyError);
         // Ensure we always set an array, never undefined or null
@@ -186,11 +187,9 @@ export function Sidebar({
       // 1. Delete the dataroom (this will also delete the vector collection)
       try {
         await api.deleteDataroom(tema);
-        console.log(`Dataroom "${tema}" deleted successfully`);
       } catch (error) {
         console.error(`Error deleting dataroom "${tema}":`, error);
         // If dataroom deletion fails, fall back to legacy deletion
-        console.log("Falling back to legacy deletion methods");
 
         // Eliminar todos los archivos del tema en Azure Blob Storage
         await api.deleteTema(tema);
@@ -200,7 +199,6 @@ export function Sidebar({
           const collectionExists = await api.checkCollectionExists(tema);
           if (collectionExists.exists) {
             await api.deleteCollection(tema);
-            console.log(`Colección "${tema}" eliminada de Qdrant`);
           }
         } catch (collectionError) {
           console.warn(
@@ -229,28 +227,28 @@ export function Sidebar({
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="bg-white border-r border-gray-200 flex flex-col h-full transition-[width] duration-300">
+      <div className="bg-slate-800 border-r border-slate-700 flex flex-col h-full transition-[width] duration-300">
         {/* Header */}
         <div
           className={cn(
-            "border-b border-gray-200 flex items-center gap-3",
+            "border-b border-slate-700 flex items-center gap-3",
             collapsed ? "p-4" : "p-6",
           )}
         >
           <div
             className={cn(
-              "flex items-center gap-2 text-gray-900 flex-1",
+              "flex items-center gap-2 text-slate-100 flex-1",
               collapsed ? "justify-center" : "justify-start",
             )}
           >
             <FileText className="h-6 w-6" />
-            {!collapsed && <h1 className="text-xl font-semibold">DoRa Luma</h1>}
+            {!collapsed && <h1 className="text-xl font-semibold">Luma</h1>}
           </div>
           {onToggleCollapse && (
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-500 hover:text-gray-900"
+              className="text-slate-400 hover:text-slate-100"
               onClick={onToggleCollapse}
               disabled={disabled}
               aria-label={
@@ -277,7 +275,7 @@ export function Sidebar({
             >
               <h2
                 className={cn(
-                  "text-sm font-medium text-gray-500",
+                  "text-sm font-medium text-slate-300",
                   collapsed && "text-xs text-center",
                 )}
               >
@@ -286,10 +284,10 @@ export function Sidebar({
               {renderWithTooltip(
                 "Crear dataroom",
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   className={cn(
-                    "gap-2",
+                    "gap-2 bg-slate-700/50 text-slate-200 hover:bg-slate-600 hover:text-slate-100 border border-slate-600",
                     collapsed
                       ? "h-10 w-10 p-0 justify-center rounded-full"
                       : "",
@@ -303,28 +301,9 @@ export function Sidebar({
               )}
             </div>
 
-            {/* Todos los archivos */}
-            {renderWithTooltip(
-              "Todos los archivos",
-              <Button
-                variant={selectedTema === null ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start",
-                  collapsed && "px-0 justify-center",
-                )}
-                onClick={() => handleTemaSelect(null)}
-                disabled={disabled}
-              >
-                <FolderIcon className={cn("h-4 w-4", !collapsed && "mr-2")} />
-                <span className={cn("truncate", collapsed && "sr-only")}>
-                  Todos los archivos
-                </span>
-              </Button>,
-            )}
-
             {/* Lista de temas */}
             {loading ? (
-              <div className="text-sm text-gray-500 px-3 py-2 text-center">
+              <div className="text-sm text-slate-400 px-3 py-2 text-center">
                 {collapsed ? "..." : "Cargando..."}
               </div>
             ) : Array.isArray(temas) && temas.length > 0 ? (
@@ -335,7 +314,8 @@ export function Sidebar({
                     <Button
                       variant={selectedTema === tema ? "secondary" : "ghost"}
                       className={cn(
-                        "w-full justify-start",
+                        "w-full justify-start text-slate-300 hover:bg-slate-700 hover:text-slate-100",
+                        selectedTema === tema && "bg-slate-700 text-slate-100",
                         collapsed ? "px-0 justify-center" : "pr-10",
                       )}
                       onClick={() => handleTemaSelect(tema)}
@@ -353,16 +333,16 @@ export function Sidebar({
                     <button
                       onClick={(e) => handleDeleteTema(tema, e)}
                       disabled={deletingTema === tema || disabled}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
                       title="Eliminar dataroom y colección"
                     >
-                      <Trash2 className="h-4 w-4 text-red-600" />
+                      <Trash2 className="h-4 w-4 text-red-400" />
                     </button>
                   )}
                 </div>
               ))
             ) : (
-              <div className="text-sm text-gray-500 px-3 py-2 text-center">
+              <div className="text-sm text-slate-400 px-3 py-2 text-center">
                 {Array.isArray(temas) && temas.length === 0
                   ? "No hay datarooms"
                   : "Cargando datarooms..."}
@@ -374,7 +354,7 @@ export function Sidebar({
         {/* Footer */}
         <div
           className={cn(
-            "p-4 border-t border-gray-200 space-y-2",
+            "p-4 border-t border-slate-700 space-y-2",
             collapsed && "flex flex-col items-center gap-2",
           )}
         >
@@ -387,7 +367,7 @@ export function Sidebar({
                 onClick={onNavigateToSchemas}
                 disabled={disabled}
                 className={cn(
-                  "w-full justify-start",
+                  "w-full justify-start bg-slate-700 text-slate-100 hover:bg-slate-600",
                   collapsed && "px-0 justify-center",
                 )}
               >
@@ -400,12 +380,12 @@ export function Sidebar({
           {renderWithTooltip(
             "Actualizar datarooms",
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={loadTemas}
               disabled={loading || disabled}
               className={cn(
-                "w-full justify-start",
+                "w-full justify-start bg-slate-700/50 text-slate-200 hover:bg-slate-600 hover:text-slate-100 border border-slate-600",
                 collapsed && "px-0 justify-center",
               )}
             >

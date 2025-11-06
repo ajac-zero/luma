@@ -16,7 +16,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileUpload } from "./FileUpload";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
 import { PDFPreviewModal } from "./PDFPreviewModal";
-import { CollectionVerifier } from "./CollectionVerifier";
 import { ChunkViewerModal } from "./ChunkViewerModal";
 import {
   ChunkingConfigModalLandingAI,
@@ -31,6 +30,9 @@ import {
   Eye,
   MessageSquare,
   Scissors,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 
 interface DashboardProps {
@@ -78,14 +80,77 @@ export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
   const [chunkingCollectionName, setChunkingCollectionName] = useState("");
   const [processing, setProcessing] = useState(false);
 
+  // Collection status states
+  const [isCheckingCollection, setIsCheckingCollection] = useState(false);
+  const [collectionExists, setCollectionExists] = useState<boolean | null>(
+    null,
+  );
+  const [collectionError, setCollectionError] = useState<string | null>(null);
+
   useEffect(() => {
     loadFiles();
   }, [selectedTema]);
 
+  // Check collection status when tema changes
+  useEffect(() => {
+    checkCollectionStatus();
+  }, [selectedTema]);
+
+  const checkCollectionStatus = async () => {
+    if (!selectedTema) {
+      setCollectionExists(null);
+      return;
+    }
+
+    setIsCheckingCollection(true);
+    setCollectionError(null);
+
+    try {
+      const result = await api.checkCollectionExists(selectedTema);
+      setCollectionExists(result.exists);
+    } catch (err) {
+      console.error("Error checking collection:", err);
+      setCollectionError(
+        err instanceof Error ? err.message : "Error al verificar colección",
+      );
+      setCollectionExists(null);
+    } finally {
+      setIsCheckingCollection(false);
+    }
+  };
+
+  const handleCreateCollection = async () => {
+    if (!selectedTema) return;
+
+    setIsCheckingCollection(true);
+    setCollectionError(null);
+
+    try {
+      const result = await api.createCollection(selectedTema);
+      if (result.success) {
+        setCollectionExists(true);
+        console.log(`Collection "${selectedTema}" created successfully`);
+      }
+    } catch (err) {
+      console.error("Error creating collection:", err);
+      setCollectionError(
+        err instanceof Error ? err.message : "Error al crear colección",
+      );
+    } finally {
+      setIsCheckingCollection(false);
+    }
+  };
+
   const loadFiles = async () => {
+    // Don't load files if no dataroom is selected
+    if (!selectedTema) {
+      setFiles([]);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await api.getFiles(selectedTema || undefined);
+      const response = await api.getFiles(selectedTema);
       setFiles(response.files);
     } catch (error) {
       console.error("Error loading files:", error);
@@ -311,13 +376,54 @@ export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
       <div className="border-b border-gray-200 px-6 py-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                {selectedTema
+                  ? `Dataroom: ${selectedTema}`
+                  : "Selecciona un dataroom"}
+              </h2>
+              {/* Collection Status Indicator */}
+              {selectedTema && (
+                <div className="flex items-center gap-2">
+                  {isCheckingCollection ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                      <span className="text-xs text-gray-500">
+                        Verificando...
+                      </span>
+                    </>
+                  ) : collectionExists === true ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      <span className="text-xs text-green-600">
+                        Colección disponible
+                      </span>
+                    </>
+                  ) : collectionExists === false ? (
+                    <>
+                      <AlertCircle className="w-4 h-4 text-yellow-600" />
+                      <button
+                        onClick={handleCreateCollection}
+                        className="text-xs text-yellow-600 hover:text-yellow-700 underline"
+                      >
+                        Crear colección
+                      </button>
+                    </>
+                  ) : collectionError ? (
+                    <>
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <span className="text-xs text-red-600">
+                        Error de conexión
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-gray-600">
               {selectedTema
-                ? `Tema actual: ${selectedTema}`
-                : "Todos los archivos"}
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
-              {totalFiles} archivo{totalFiles !== 1 ? "s" : ""}
+                ? `${totalFiles} archivo${totalFiles !== 1 ? "s" : ""}`
+                : "Selecciona un dataroom de la barra lateral para ver sus archivos"}
             </p>
           </div>
         </div>
@@ -422,9 +528,11 @@ export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
               <div className="flex flex-col items-center justify-center h-64">
                 <FileText className="w-12 h-12 text-gray-400 mb-4" />
                 <p className="text-gray-500">
-                  {searchTerm
-                    ? "No se encontraron archivos"
-                    : "No hay archivos en este tema"}
+                  {!selectedTema
+                    ? "Selecciona un dataroom para ver sus archivos"
+                    : searchTerm
+                      ? "No se encontraron archivos"
+                      : "No hay archivos en este dataroom"}
                 </p>
               </div>
             ) : (
@@ -577,14 +685,6 @@ export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
         fileUrl={previewFileUrl}
         fileName={previewFileName}
         onDownload={handleDownloadFromPreview}
-      />
-
-      {/* Collection Verifier - Verifica/crea colección cuando se selecciona un tema */}
-      <CollectionVerifier
-        tema={selectedTema}
-        onVerified={(exists) => {
-          console.log(`Collection ${selectedTema} exists: ${exists}`);
-        }}
       />
 
       {/* Chunk Viewer Modal */}

@@ -7,24 +7,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .core.config import settings
+from .routers.agent import router as agent_router
 from .routers.chunking import router as chunking_router
 from .routers.chunking_landingai import router as chunking_landingai_router
 from .routers.dataroom import router as dataroom_router
-
-# Import routers
 from .routers.files import router as files_router
 from .routers.schemas import router as schemas_router
 from .routers.vectors import router as vectors_router
 
-# from routers.ai import router as ai_router  #  futuro con Azure OpenAI
-
-# Import config
-
-
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
+logging.getLogger("app").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -129,6 +124,8 @@ app.include_router(schemas_router)
 app.include_router(chunking_landingai_router)
 
 app.include_router(dataroom_router, prefix="/api/v1")
+
+app.include_router(agent_router)
 
 # Router para IA
 # app.include_router(
