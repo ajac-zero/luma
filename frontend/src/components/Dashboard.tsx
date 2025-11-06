@@ -324,22 +324,22 @@ export function Dashboard({ onProcessingChange }: DashboardProps = {}) {
       </div>
       <Tabs defaultValue="files" className="flex flex-col flex-1">
         <div className="border-b border-gray-200 px-6 py-2">
-          <TabsList className="flex h-10 items-center gap-2 bg-transparent p-0 justify-start">
+          <TabsList className="flex h-10 w-full items-center gap-2 bg-transparent p-0 justify-start">
             <TabsTrigger
               value="dashboard"
-              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-0 data-[state=active]:shadow-black/30"
+              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-gray-900 data-[state=active]:text-white data-[state=active]:shadow"
             >
               Dashboard
             </TabsTrigger>
             <TabsTrigger
               value="files"
-              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-0 data-[state=active]:shadow-black/30"
+              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-gray-900 data-[state=active]:text-white data-[state=active]:shadow"
             >
               Files
             </TabsTrigger>
             <TabsTrigger
               value="chat"
-              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-0 data-[state=active]:shadow-black/30"
+              className="rounded-md px-4 py-2 text-sm font-medium text-gray-600 transition data-[state=active]:bg-gray-900 data-[state=active]:text-white data-[state=active]:shadow"
             >
               Chat
             </TabsTrigger>

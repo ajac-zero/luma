@@ -6,8 +6,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
     networks:
@@ -20,8 +18,19 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-      - /app/.venv
+      - ./backend/app:/app/app
+      - ./backend/.secrets:/app/.secrets
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  db:
+    # docker run -p 6379:6379 -p 8001:8001 redis/redis-stack
+    image: redis/redis-stack:latest
+    ports:
+      - 6379:6379
+      - 8001:8001
     networks:
       - app-network
 

@@ -1,16 +1,21 @@
+import logging
+from contextlib import asynccontextmanager
+
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import uvicorn
-import logging
+
+from .core.config import settings
+from .routers.chunking import router as chunking_router
+from .routers.chunking_landingai import router as chunking_landingai_router
+from .routers.dataroom import router as dataroom_router
 
 # Import routers
 from .routers.files import router as files_router
-from .routers.vectors import router as vectors_router
-from .routers.chunking import router as chunking_router
 from .routers.schemas import router as schemas_router
-from .routers.chunking_landingai import router as chunking_landingai_router
-from .core.config import settings
+from .routers.vectors import router as vectors_router
+
 # from routers.ai import router as ai_router  #  futuro con Azure OpenAI
 
 # Import config
@@ -18,10 +23,23 @@ from .core.config import settings
 
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    logger.info("Iniciando File Manager API...")
+    logger.info(
+        f"Conectando a Azure Storage Account: {settings.AZURE_STORAGE_ACCOUNT_NAME}"
+    )
+    logger.info(f"Conectando a Qdrant: {settings.QDRANT_URL}")
+
+    yield
+
+    logger.info("Cerrando File Manager API...")
+    # Cleanup de recursos si es necesario
 
 
 app = FastAPI(
@@ -29,7 +47,7 @@ app = FastAPI(
     description=" DoRa",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Configurar CORS para React frontend
@@ -41,6 +59,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Middleware para logging de requests
 @app.middleware("http")
 async def log_requests(request, call_next):
@@ -49,18 +68,16 @@ async def log_requests(request, call_next):
     logger.info(f"Response: {response.status_code}")
     return response
 
+
 # Manejador global de excepciones
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     logger.error(f"HTTP Exception: {exc.status_code} - {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": True,
-            "message": exc.detail,
-            "status_code": exc.status_code
-        }
+        content={"error": True, "message": exc.detail, "status_code": exc.status_code},
     )
+
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
@@ -70,9 +87,10 @@ async def general_exception_handler(request, exc):
         content={
             "error": True,
             "message": "Error interno del servidor",
-            "status_code": 500
-        }
+            "status_code": 500,
+        },
     )
+
 
 # Health check endpoint
 @app.get("/health")
@@ -81,8 +99,9 @@ async def health_check():
     return {
         "status": "healthy",
         "message": "File Manager API está funcionando correctamente",
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
+
 
 # Root endpoint
 @app.get("/")
@@ -92,33 +111,24 @@ async def root():
         "message": "File Manager API",
         "version": "1.0.0",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
 
+
 # Incluir routers
-app.include_router(
-    files_router,
-    prefix="/api/v1/files",
-    tags=["files"]
-)
+app.include_router(files_router, prefix="/api/v1/files", tags=["files"])
 
-app.include_router(
-    vectors_router,
-    prefix="/api/v1",
-    tags=["vectors"]
-)
+app.include_router(vectors_router, prefix="/api/v1", tags=["vectors"])
 
-app.include_router(
-    chunking_router,
-    prefix="/api/v1",
-    tags=["chunking"]
-)
+app.include_router(chunking_router, prefix="/api/v1", tags=["chunking"])
 
 # Schemas router (nuevo)
 app.include_router(schemas_router)
 
 # Chunking LandingAI router (nuevo)
 app.include_router(chunking_landingai_router)
+
+app.include_router(dataroom_router, prefix="/api/v1")
 
 # Router para IA
 # app.include_router(
@@ -127,21 +137,6 @@ app.include_router(chunking_landingai_router)
 #     tags=["ai"]
 # )
 
-# Evento de startup
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Iniciando File Manager API...")
-    logger.info(f"Conectando a Azure Storage Account: {settings.AZURE_STORAGE_ACCOUNT_NAME}")
-    logger.info(f"Conectando a Qdrant: {settings.QDRANT_URL}")
-    #  validaciones de conexión a Azure
-    
-
-# Evento de shutdown
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Cerrando File Manager API...")
-    # Cleanup de recursos si es necesario
-
 
 if __name__ == "__main__":
     uvicorn.run(
@@ -149,5 +144,5 @@ if __name__ == "__main__":
         host=settings.HOST,
         port=settings.PORT,
         reload=settings.DEBUG,
-        log_level="info"
+        log_level="info",
     )
