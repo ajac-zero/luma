@@ -27,11 +27,12 @@ services:
 
   db:
     image: redis/redis-stack:latest
+    command: redis-server --appendonly yes
     ports:
       - 6379:6379
       - 8001:8001
     volumes:
-      - redis_data:/data        # Persistent Redis data
+      - ./redis_data:/data
     restart: unless-stopped
     networks:
       - app-network
