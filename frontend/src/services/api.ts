@@ -39,6 +39,30 @@ interface DataroomsResponse {
   }>;
 }
 
+interface DataroomInfo {
+  name: string;
+  collection: string;
+  storage: string;
+  file_count: number;
+  total_size_bytes: number;
+  total_size_mb: number;
+  collection_exists: boolean;
+  vector_count: number | null;
+  collection_info: {
+    vectors_count: number;
+    indexed_vectors_count: number;
+    points_count: number;
+    segments_count: number;
+    status: string;
+  } | null;
+  file_types: Record<string, number>;
+  recent_files: Array<{
+    name: string;
+    size_mb: number;
+    last_modified: string;
+  }>;
+}
+
 interface CreateDataroomRequest {
   name: string;
   collection?: string;
@@ -97,6 +121,15 @@ export const api = {
       },
     );
     if (!response.ok) throw new Error("Error deleting dataroom");
+    return response.json();
+  },
+
+  // Obtener información detallada de un dataroom
+  getDataroomInfo: async (dataroomName: string): Promise<DataroomInfo> => {
+    const response = await fetch(
+      `${API_BASE_URL}/dataroom/${encodeURIComponent(dataroomName)}/info`,
+    );
+    if (!response.ok) throw new Error("Error fetching dataroom info");
     return response.json();
   },
 

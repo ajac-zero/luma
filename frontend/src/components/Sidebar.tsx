@@ -273,14 +273,11 @@ export function Sidebar({
                 collapsed ? "justify-center" : "justify-between",
               )}
             >
-              <h2
-                className={cn(
-                  "text-sm font-medium text-slate-300",
-                  collapsed && "text-xs text-center",
-                )}
-              >
-                {collapsed ? "Rooms" : "Datarooms"}
-              </h2>
+              {!collapsed && (
+                <h2 className="text-sm font-medium text-slate-300">
+                  Datarooms
+                </h2>
+              )}
               {renderWithTooltip(
                 "Crear dataroom",
                 <Button

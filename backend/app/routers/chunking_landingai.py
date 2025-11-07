@@ -2,17 +2,18 @@
 Router para procesamiento de PDFs con LandingAI.
 Soporta dos modos: rápido (solo parse) y extracción (parse + extract con schema).
 """
+
 import logging
 import time
+from typing import List, Literal, Optional
+
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import Optional, List, Literal
-
 from langchain_core.documents import Document
+from pydantic import BaseModel, Field
 
-from ..services.landingai_service import get_landingai_service
-from ..services.chunking_service import get_chunking_service
 from ..repositories.schema_repository import get_schema_repository
+from ..services.chunking_service import get_chunking_service
+from ..services.landingai_service import get_landingai_service
 from ..utils.chunking.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/api/v1/chunking-landingai", tags=["chunking-landinga
 
 class ProcessLandingAIRequest(BaseModel):
     """Request para procesar PDF con LandingAI"""
+
     file_name: str = Field(..., description="Nombre del archivo PDF")
     tema: str = Field(..., description="Tema/carpeta del archivo")
     collection_name: str = Field(..., description="Colección de Qdrant")
@@ -29,34 +31,33 @@ class ProcessLandingAIRequest(BaseModel):
     # Modo de procesamiento
     mode: Literal["quick", "extract"] = Field(
         default="quick",
-        description="Modo: 'quick' (solo parse) o 'extract' (parse + datos estructurados)"
+        description="Modo: 'quick' (solo parse) o 'extract' (parse + datos estructurados)",
     )
 
     # Schema (obligatorio si mode='extract')
     schema_id: Optional[str] = Field(
-        None,
-        description="ID del schema a usar (requerido si mode='extract')"
+        None, description="ID del schema a usar (requerido si mode='extract')"
     )
 
     # Configuración de chunks
     include_chunk_types: List[str] = Field(
         default=["text", "table"],
-        description="Tipos de chunks a incluir: text, table, figure, etc."
+        description="Tipos de chunks a incluir: text, table, figure, etc.",
     )
     max_tokens_per_chunk: int = Field(
         default=1500,
         ge=500,
         le=3000,
-        description="Tokens máximos por chunk (flexible para tablas/figuras)"
+        description="Tokens máximos por chunk (flexible para tablas/figuras)",
     )
     merge_small_chunks: bool = Field(
-        default=True,
-        description="Unir chunks pequeños de la misma página y tipo"
+        default=True, description="Unir chunks pequeños de la misma página y tipo"
     )
 
 
 class ProcessLandingAIResponse(BaseModel):
     """Response del procesamiento con LandingAI"""
+
     success: bool
     mode: str
     processing_time_seconds: float
@@ -97,9 +98,9 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
     start_time = time.time()
 
     try:
-        logger.info(f"\n{'='*60}")
-        logger.info(f"INICIANDO PROCESAMIENTO CON LANDINGAI")
-        logger.info(f"{'='*60}")
+        logger.info(f"\n{'=' * 60}")
+        logger.info("INICIANDO PROCESAMIENTO CON LANDINGAI")
+        logger.info(f"{'=' * 60}")
         logger.info(f"Archivo: {request.file_name}")
         logger.info(f"Tema: {request.tema}")
         logger.info(f"Modo: {request.mode}")
@@ -111,7 +112,7 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
             if not request.schema_id:
                 raise HTTPException(
                     status_code=400,
-                    detail="schema_id es requerido cuando mode='extract'"
+                    detail="schema_id es requerido cuando mode='extract'",
                 )
 
             schema_repo = get_schema_repository()
@@ -119,8 +120,7 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
 
             if not custom_schema:
                 raise HTTPException(
-                    status_code=404,
-                    detail=f"Schema no encontrado: {request.schema_id}"
+                    status_code=404, detail=f"Schema no encontrado: {request.schema_id}"
                 )
 
             logger.info(f"Schema seleccionado: {custom_schema.schema_name}")
@@ -131,14 +131,12 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
 
         try:
             pdf_bytes = await chunking_service.download_pdf_from_blob(
-                request.file_name,
-                request.tema
+                request.file_name, request.tema
             )
         except Exception as e:
             logger.error(f"Error descargando PDF: {e}")
             raise HTTPException(
-                status_code=404,
-                detail=f"No se pudo descargar el PDF: {str(e)}"
+                status_code=404, detail=f"No se pudo descargar el PDF: {str(e)}"
             )
 
         # 3. Procesar con LandingAI
@@ -150,13 +148,12 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
                 pdf_bytes=pdf_bytes,
                 file_name=request.file_name,
                 custom_schema=custom_schema,
-                include_chunk_types=request.include_chunk_types
+                include_chunk_types=request.include_chunk_types,
             )
         except Exception as e:
             logger.error(f"Error en LandingAI: {e}")
             raise HTTPException(
-                status_code=500,
-                detail=f"Error procesando con LandingAI: {str(e)}"
+                status_code=500, detail=f"Error procesando con LandingAI: {str(e)}"
             )
 
         documents = result["chunks"]
@@ -164,7 +161,7 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
         if not documents:
             raise HTTPException(
                 status_code=400,
-                detail="No se generaron chunks después del procesamiento"
+                detail="No se generaron chunks después del procesamiento",
             )
 
         # 4. Aplicar control flexible de tokens
@@ -172,7 +169,7 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
         documents = _apply_flexible_token_control(
             documents,
             max_tokens=request.max_tokens_per_chunk,
-            merge_small=request.merge_small_chunks
+            merge_small=request.merge_small_chunks,
         )
 
         # 5. Generar embeddings
@@ -180,13 +177,16 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
         texts = [doc.page_content for doc in documents]
 
         try:
-            embeddings = await chunking_service.embedding_service.generate_embeddings_batch(texts)
+            embeddings = (
+                await chunking_service.embedding_service.generate_embeddings_batch(
+                    texts
+                )
+            )
             logger.info(f"Embeddings generados: {len(embeddings)} vectores")
         except Exception as e:
             logger.error(f"Error generando embeddings: {e}")
             raise HTTPException(
-                status_code=500,
-                detail=f"Error generando embeddings: {str(e)}"
+                status_code=500, detail=f"Error generando embeddings: {str(e)}"
             )
 
         # 6. Preparar chunks para Qdrant con IDs determinísticos
@@ -198,38 +198,38 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
             chunk_id = chunking_service._generate_deterministic_id(
                 file_name=request.file_name,
                 page=doc.metadata.get("page", 1),
-                chunk_index=doc.metadata.get("chunk_id", str(idx))
+                chunk_index=doc.metadata.get("chunk_id", str(idx)),
             )
 
-            qdrant_chunks.append({
-                "id": chunk_id,
-                "vector": embedding,
-                "payload": {
-                    "page_content": doc.page_content,
-                    "metadata": doc.metadata  # Metadata rica de LandingAI
+            qdrant_chunks.append(
+                {
+                    "id": chunk_id,
+                    "vector": embedding,
+                    "payload": {
+                        "page_content": doc.page_content,
+                        "metadata": doc.metadata,  # Metadata rica de LandingAI
+                    },
                 }
-            })
+            )
 
         # 7. Subir a Qdrant
         try:
             upload_result = await chunking_service.vector_db.add_chunks(
-                request.collection_name,
-                qdrant_chunks
+                request.collection_name, qdrant_chunks
             )
             logger.info(f"Subida completada: {upload_result['chunks_added']} chunks")
         except Exception as e:
             logger.error(f"Error subiendo a Qdrant: {e}")
             raise HTTPException(
-                status_code=500,
-                detail=f"Error subiendo a Qdrant: {str(e)}"
+                status_code=500, detail=f"Error subiendo a Qdrant: {str(e)}"
             )
 
         # Tiempo total
         processing_time = time.time() - start_time
 
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"PROCESAMIENTO COMPLETADO")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
         logger.info(f"Tiempo: {processing_time:.2f}s")
         logger.info(f"Chunks procesados: {len(documents)}")
         logger.info(f"Chunks subidos: {upload_result['chunks_added']}")
@@ -245,23 +245,18 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
             schema_used=custom_schema.schema_id if custom_schema else None,
             extracted_data=result.get("extracted_data"),
             parse_metadata=result["parse_metadata"],
-            message=f"PDF procesado exitosamente en modo {request.mode}"
+            message=f"PDF procesado exitosamente en modo {request.mode}",
         )
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error inesperado en procesamiento: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error inesperado: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
 
 def _apply_flexible_token_control(
-    documents: List[Document],
-    max_tokens: int,
-    merge_small: bool
+    documents: List[Document], max_tokens: int, merge_small: bool
 ) -> List[Document]:
     """
     Aplica control flexible de tokens (Opción C del diseño).
@@ -306,14 +301,10 @@ def _apply_flexible_token_control(
 
         else:
             # Intentar merge si es pequeño
-            if (
-                merge_small and
-                tokens < max_tokens * 0.5 and
-                i < len(documents) - 1
-            ):
+            if merge_small and tokens < max_tokens * 0.5 and i < len(documents) - 1:
                 next_doc = documents[i + 1]
                 if _can_merge(doc, next_doc, max_tokens, token_manager):
-                    logger.debug(f"Merging chunks {i} y {i+1}")
+                    logger.debug(f"Merging chunks {i} y {i + 1}")
                     doc = _merge_documents(doc, next_doc)
                     i += 1  # Skip next
 
@@ -326,9 +317,7 @@ def _apply_flexible_token_control(
 
 
 def _split_large_chunk(
-    doc: Document,
-    max_tokens: int,
-    token_manager: TokenManager
+    doc: Document, max_tokens: int, token_manager: TokenManager
 ) -> List[Document]:
     """Divide un chunk grande en sub-chunks"""
     content = doc.page_content
@@ -343,8 +332,7 @@ def _split_large_chunk(
             # Guardar chunk actual
             sub_content = " ".join(current_chunk)
             sub_doc = Document(
-                page_content=sub_content,
-                metadata={**doc.metadata, "is_split": True}
+                page_content=sub_content, metadata={**doc.metadata, "is_split": True}
             )
             sub_chunks.append(sub_doc)
             current_chunk = [word]
@@ -357,8 +345,7 @@ def _split_large_chunk(
     if current_chunk:
         sub_content = " ".join(current_chunk)
         sub_doc = Document(
-            page_content=sub_content,
-            metadata={**doc.metadata, "is_split": True}
+            page_content=sub_content, metadata={**doc.metadata, "is_split": True}
         )
         sub_chunks.append(sub_doc)
 
@@ -366,10 +353,7 @@ def _split_large_chunk(
 
 
 def _can_merge(
-    doc1: Document,
-    doc2: Document,
-    max_tokens: int,
-    token_manager: TokenManager
+    doc1: Document, doc2: Document, max_tokens: int, token_manager: TokenManager
 ) -> bool:
     """Verifica si dos docs se pueden mergear"""
     # Misma página
@@ -391,6 +375,5 @@ def _merge_documents(doc1: Document, doc2: Document) -> Document:
     """Mergea dos documentos"""
     merged_content = f"{doc1.page_content}\n\n{doc2.page_content}"
     return Document(
-        page_content=merged_content,
-        metadata={**doc1.metadata, "is_merged": True}
+        page_content=merged_content, metadata={**doc1.metadata, "is_merged": True}
     )

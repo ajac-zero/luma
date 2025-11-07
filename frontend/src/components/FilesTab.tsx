@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFileStore } from "@/stores/fileStore";
 import { api } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -79,6 +79,11 @@ export function FilesTab({
   const [chunkingFileName, setChunkingFileName] = useState("");
   const [chunkingFileTema, setChunkingFileTema] = useState("");
   const [chunkingCollectionName, setChunkingCollectionName] = useState("");
+
+  // Load files when component mounts or selectedTema changes
+  useEffect(() => {
+    loadFiles();
+  }, [selectedTema]);
 
   const loadFiles = async () => {
     // Don't load files if no dataroom is selected
