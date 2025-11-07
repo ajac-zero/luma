@@ -218,10 +218,10 @@ export function FilesTab({
         tema: chunkingFileTema,
         collection_name: chunkingCollectionName,
         mode: config.mode,
-        schema_id: config.schemaId,
-        include_chunk_types: config.includeChunkTypes,
-        max_tokens_per_chunk: config.maxTokensPerChunk,
-        merge_small_chunks: config.mergeSmallChunks,
+        schema_id: config.schema_id,
+        include_chunk_types: config.include_chunk_types,
+        max_tokens_per_chunk: config.max_tokens_per_chunk,
+        merge_small_chunks: config.merge_small_chunks,
       };
 
       await api.processWithLandingAI(processConfig);

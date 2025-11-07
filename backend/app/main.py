@@ -11,6 +11,7 @@ from .routers.agent import router as agent_router
 from .routers.chunking import router as chunking_router
 from .routers.chunking_landingai import router as chunking_landingai_router
 from .routers.dataroom import router as dataroom_router
+from .routers.extracted_data import router as extracted_data_router
 from .routers.files import router as files_router
 from .routers.schemas import router as schemas_router
 from .routers.vectors import router as vectors_router
@@ -122,6 +123,9 @@ app.include_router(schemas_router)
 
 # Chunking LandingAI router (nuevo)
 app.include_router(chunking_landingai_router)
+
+# Extracted data router (nuevo)
+app.include_router(extracted_data_router)
 
 app.include_router(dataroom_router, prefix="/api/v1")
 

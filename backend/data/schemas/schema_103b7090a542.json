@@ -1,0 +1,767 @@
+{
+  "schema_id": "schema_103b7090a542",
+  "schema_name": "Form 990-PF Data Extraction",
+  "description": "Comprehensive data extraction schema for IRS Form 990-PF (Private Foundation) including financial, governance, and operational information",
+  "fields": [
+    {
+      "name": "ein",
+      "type": "string",
+      "description": "Federal Employer Identification Number of the organization",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": "^\\d{2}-\\d{7}$"
+    },
+    {
+      "name": "legal_name",
+      "type": "string",
+      "description": "Official registered name of the organization",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "phone_number",
+      "type": "string",
+      "description": "Primary contact phone number",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": "^\\([0-9]{3}\\) [0-9]{3}-[0-9]{4}$"
+    },
+    {
+      "name": "website_url",
+      "type": "string",
+      "description": "Organization's website address",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "return_type",
+      "type": "string",
+      "description": "Type of IRS return filed (990-PF for private foundations)",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "amended_return",
+      "type": "string",
+      "description": "Indicates if this is an amended return (Yes/No)",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "group_exemption_number",
+      "type": "string",
+      "description": "IRS group exemption number, if applicable",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "subsection_code",
+      "type": "string",
+      "description": "IRS subsection code (typically 501(c)(3) for foundations)",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "ruling_date",
+      "type": "string",
+      "description": "Date of IRS ruling or determination letter",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "accounting_method",
+      "type": "string",
+      "description": "Accounting method used (Cash, Accrual, or Other)",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "organization_type",
+      "type": "string",
+      "description": "Legal structure (corporation, trust, association, etc.)",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "year_of_formation",
+      "type": "string",
+      "description": "Year the organization was established",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "incorporation_state",
+      "type": "string",
+      "description": "State where the organization was incorporated",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "total_revenue",
+      "type": "float",
+      "description": "Sum of all revenue sources for the year",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "contributions_gifts_grants",
+      "type": "float",
+      "description": "Revenue from donations, contributions, and grants",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "program_service_revenue",
+      "type": "float",
+      "description": "Revenue generated from program services",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "membership_dues",
+      "type": "float",
+      "description": "Revenue from membership dues and assessments",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "investment_income",
+      "type": "float",
+      "description": "Income from interest, dividends, and other investments",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "gains_losses_sales_assets",
+      "type": "float",
+      "description": "Net gains or losses from sale of investments and assets",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "rental_income",
+      "type": "float",
+      "description": "Income from rental of real estate or equipment",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "related_organizations_revenue",
+      "type": "float",
+      "description": "Revenue received from related organizations",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "gaming_revenue",
+      "type": "float",
+      "description": "Revenue from gaming and gambling activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "other_revenue",
+      "type": "float",
+      "description": "All other revenue not categorized elsewhere",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "government_grants",
+      "type": "float",
+      "description": "Revenue from federal, state, and local government grants",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "foreign_contributions",
+      "type": "float",
+      "description": "Revenue from foreign sources and contributors",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "total_expenses",
+      "type": "float",
+      "description": "Sum of all organizational expenses for the year",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "program_services_expenses",
+      "type": "float",
+      "description": "Direct expenses for charitable program activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "management_general_expenses",
+      "type": "float",
+      "description": "Administrative and general operating expenses",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "fundraising_expenses",
+      "type": "float",
+      "description": "Expenses related to fundraising activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "grants_us_organizations",
+      "type": "float",
+      "description": "Grants and assistance provided to domestic organizations",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "grants_us_individuals",
+      "type": "float",
+      "description": "Grants and assistance provided to domestic individuals",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "grants_foreign_organizations",
+      "type": "float",
+      "description": "Grants and assistance provided to foreign organizations",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "grants_foreign_individuals",
+      "type": "float",
+      "description": "Grants and assistance provided to foreign individuals",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "compensation_officers",
+      "type": "float",
+      "description": "Total compensation paid to officers and key employees",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "compensation_other_staff",
+      "type": "float",
+      "description": "Compensation paid to other employees",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "payroll_taxes_benefits",
+      "type": "float",
+      "description": "Payroll taxes, pension plans, and employee benefits",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "professional_fees",
+      "type": "float",
+      "description": "Legal, accounting, and other professional service fees",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "office_occupancy_costs",
+      "type": "float",
+      "description": "Rent, utilities, and facility-related expenses",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "information_technology_costs",
+      "type": "float",
+      "description": "IT equipment, software, and technology expenses",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "travel_conference_expenses",
+      "type": "float",
+      "description": "Travel, conferences, conventions, and meetings",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "depreciation_amortization",
+      "type": "float",
+      "description": "Depreciation of equipment and amortization of intangibles",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "insurance",
+      "type": "float",
+      "description": "Insurance premiums and related costs",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "officers_list",
+      "type": "array_string",
+      "description": "JSON array of officers, directors, trustees, and key employees with their details",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "governing_body_size",
+      "type": "integer",
+      "description": "Total number of voting members on the governing body",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "independent_members",
+      "type": "integer",
+      "description": "Number of independent voting members",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "financial_statements_reviewed",
+      "type": "string",
+      "description": "Whether financial statements were reviewed or audited",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "form_990_provided_to_governing_body",
+      "type": "string",
+      "description": "Whether Form 990 was provided to governing body before filing",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "conflict_of_interest_policy",
+      "type": "string",
+      "description": "Whether organization has a conflict of interest policy",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "whistleblower_policy",
+      "type": "string",
+      "description": "Whether organization has a whistleblower policy",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "document_retention_policy",
+      "type": "string",
+      "description": "Whether organization has a document retention and destruction policy",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "ceo_compensation_review_process",
+      "type": "string",
+      "description": "Process used to determine compensation of organization's top management",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "public_disclosure_practices",
+      "type": "string",
+      "description": "How organization makes its governing documents and annual returns available to the public",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "program_accomplishments_list",
+      "type": "array_string",
+      "description": "JSON array of program service accomplishments with descriptions and financial details",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "total_fundraising_event_revenue",
+      "type": "float",
+      "description": "Total revenue from all fundraising events",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "total_fundraising_event_expenses",
+      "type": "float",
+      "description": "Total direct expenses for all fundraising events",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "professional_fundraiser_fees",
+      "type": "float",
+      "description": "Fees paid to professional fundraising services",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "number_of_employees",
+      "type": "integer",
+      "description": "Total number of employees during the year",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "number_of_volunteers",
+      "type": "integer",
+      "description": "Estimate of volunteers who provided services",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "occupancy_costs",
+      "type": "float",
+      "description": "Total costs for office space and facilities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "fundraising_method_descriptions",
+      "type": "string",
+      "description": "Description of methods used for fundraising",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "joint_ventures_disregarded_entities",
+      "type": "string",
+      "description": "Information about joint ventures and disregarded entities",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "base_compensation",
+      "type": "float",
+      "description": "Base salary or wages paid to key personnel",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "bonus",
+      "type": "float",
+      "description": "Bonus and incentive compensation paid",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "incentive",
+      "type": "float",
+      "description": "Other incentive compensation",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "other_compensation",
+      "type": "float",
+      "description": "Other forms of compensation",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "non_fixed_compensation",
+      "type": "string",
+      "description": "Whether compensation arrangement is non-fixed",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "first_class_travel",
+      "type": "string",
+      "description": "Whether first-class or charter travel was provided",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "housing_allowance",
+      "type": "string",
+      "description": "Whether housing allowance or residence was provided",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "expense_account_usage",
+      "type": "string",
+      "description": "Whether payments for business use of personal residence were made",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "supplemental_retirement",
+      "type": "string",
+      "description": "Whether supplemental nonqualified retirement plan was provided",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "lobbying_expenditures_direct",
+      "type": "float",
+      "description": "Amount spent on direct lobbying activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "lobbying_expenditures_grassroots",
+      "type": "float",
+      "description": "Amount spent on grassroots lobbying activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "election_501h_status",
+      "type": "string",
+      "description": "Whether the organization made a Section 501(h) election",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "political_campaign_expenditures",
+      "type": "float",
+      "description": "Amount spent on political campaign activities",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "related_organizations_affiliates",
+      "type": "string",
+      "description": "Information about related organizations involved in political activities",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "investment_types",
+      "type": "string",
+      "description": "Description of types of investments held",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "donor_restricted_endowment_values",
+      "type": "float",
+      "description": "Value of permanently restricted endowment funds",
+      "required": true,
+      "min_value": 0,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "net_appreciation_depreciation",
+      "type": "float",
+      "description": "Net appreciation or depreciation in fair value of investments",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "related_organization_transactions",
+      "type": "string",
+      "description": "Information about transactions with related organizations",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "loans_to_from_related_parties",
+      "type": "string",
+      "description": "Information about loans to or from related parties",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "penalties_excise_taxes_reported",
+      "type": "string",
+      "description": "Whether the organization reported any penalties or excise taxes",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "unrelated_business_income_disclosure",
+      "type": "string",
+      "description": "Whether the organization had unrelated business income",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "foreign_bank_account_reporting",
+      "type": "string",
+      "description": "Whether the organization had foreign bank accounts or assets",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
+      "name": "schedule_o_narrative_explanations",
+      "type": "string",
+      "description": "Additional narrative explanations from Schedule O",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    }
+  ],
+  "created_at": "2025-11-07T23:45:00.000000",
+  "updated_at": "2025-11-07T23:45:00.000000",
+  "tema": "IRS_FORM_990PF",
+  "is_global": true
+}

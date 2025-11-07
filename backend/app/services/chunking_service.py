@@ -66,6 +66,8 @@ class ChunkingService:
         """
         Descarga un PDF desde Azure Blob Storage.
 
+        NOTA: Todos los blobs se guardan en minúsculas en Azure.
+
         Args:
             file_name: Nombre del archivo
             tema: Tema/carpeta del archivo
@@ -77,8 +79,9 @@ class ChunkingService:
             Exception: Si hay error descargando el archivo
         """
         try:
-            blob_path = f"{tema}/{file_name}"
-            logger.info(f"Descargando PDF: {blob_path}")
+            # Convertir a minúsculas ya que todos los blobs están en minúsculas
+            blob_path = f"{tema.lower()}/{file_name.lower()}"
+            logger.info(f"Descargando PDF: {blob_path} (tema original: {tema}, file original: {file_name})")
 
             blob_client = self.blob_service.get_blob_client(
                 container=self.container_name,

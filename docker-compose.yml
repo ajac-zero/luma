@@ -20,6 +20,7 @@ services:
     volumes:
       - ./backend/app:/app/app
       - ./backend/.secrets:/app/.secrets
+      - ./backend/data:/app/data
     env_file:
       - .env
     networks:
@@ -27,7 +28,6 @@ services:
 
   db:
     image: redis/redis-stack:latest
-    command: redis-server --appendonly yes
     ports:
       - 6379:6379
       - 8001:8001

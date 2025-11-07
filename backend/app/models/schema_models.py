@@ -58,7 +58,7 @@ class CustomSchema(BaseModel):
     schema_id: Optional[str] = Field(None, description="ID único del schema (generado automáticamente si no se provee)")
     schema_name: str = Field(..., description="Nombre descriptivo del schema", min_length=1, max_length=100)
     description: str = Field(..., description="Descripción de qué extrae este schema", min_length=1, max_length=500)
-    fields: List[SchemaField] = Field(..., description="Lista de campos a extraer", min_items=1, max_items=50)
+    fields: List[SchemaField] = Field(..., description="Lista de campos a extraer", min_items=1, max_items=200)
 
     # Metadata
     created_at: Optional[str] = Field(None, description="Timestamp de creación ISO")

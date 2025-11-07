@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from ..repositories.schema_repository import get_schema_repository
 from ..services.chunking_service import get_chunking_service
 from ..services.landingai_service import get_landingai_service
+from ..services.extracted_data_service import get_extracted_data_service
 from ..utils.chunking.token_manager import TokenManager
 
 logger = logging.getLogger(__name__)
@@ -105,11 +106,12 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
         logger.info(f"Tema: {request.tema}")
         logger.info(f"Modo: {request.mode}")
         logger.info(f"Colección: {request.collection_name}")
+        logger.info(f"Schema ID recibido: '{request.schema_id}' (tipo: {type(request.schema_id).__name__})")
 
         # 1. Validar schema si es modo extract
         custom_schema = None
         if request.mode == "extract":
-            if not request.schema_id:
+            if not request.schema_id or request.schema_id.strip() == "":
                 raise HTTPException(
                     status_code=400,
                     detail="schema_id es requerido cuando mode='extract'",
@@ -223,6 +225,22 @@ async def process_with_landingai(request: ProcessLandingAIRequest):
             raise HTTPException(
                 status_code=500, detail=f"Error subiendo a Qdrant: {str(e)}"
             )
+
+        # 8. Guardar datos extraídos en Redis (si existe extracted_data)
+        if result.get("extracted_data") and result["extracted_data"].get("extraction"):
+            try:
+                logger.info("\n[6/6] Guardando datos extraídos en Redis...")
+                extracted_data_service = get_extracted_data_service()
+
+                await extracted_data_service.save_extracted_data(
+                    file_name=request.file_name,
+                    tema=request.tema,
+                    collection_name=request.collection_name,
+                    extracted_data=result["extracted_data"]["extraction"]
+                )
+            except Exception as e:
+                # No fallar si Redis falla, solo logear
+                logger.warning(f"⚠️  No se pudieron guardar datos en Redis (no crítico): {e}")
 
         # Tiempo total
         processing_time = time.time() - start_time

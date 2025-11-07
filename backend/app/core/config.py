@@ -41,6 +41,13 @@ class Settings(BaseSettings):
     AZURE_OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-large"
     AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-large"
 
+    # Rate limiting para embeddings (ajustar según tier de Azure OpenAI)
+    # S0 tier: batch_size=16, delay=1.0 es seguro
+    # Tier superior: batch_size=100, delay=0.1
+    EMBEDDING_BATCH_SIZE: int = 16
+    EMBEDDING_DELAY_BETWEEN_BATCHES: float = 1.0
+    EMBEDDING_MAX_RETRIES: int = 5
+
     # Google Cloud / Vertex AI configuración
     GOOGLE_APPLICATION_CREDENTIALS: str
     GOOGLE_CLOUD_PROJECT: str
