@@ -6,7 +6,7 @@ from pydantic_ai.ui.vercel_ai import VercelAIAdapter
 from starlette.requests import Request
 from starlette.responses import Response
 
-from app.agents import form_auditor
+from app.agents import form_auditor, web_search
 from app.core.config import settings
 
 provider = AzureProvider(
@@ -357,6 +357,14 @@ data = {
 async def build_audit_report():
     """Calls the audit subagent to get a full audit report of the organization"""
     result = await form_auditor.build_audit_report(data)
+
+    return result.model_dump()
+
+
+@agent.tool_plain
+async def search_web_information(query: str, max_results: int = 5):
+    """Search the web for up-to-date information using Tavily. Use this when you need current information, news, research, or facts not in your knowledge base."""
+    result = await web_search.search_web(query=query, max_results=max_results)
 
     return result.model_dump()
 

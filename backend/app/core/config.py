@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # Azure OpenAI configuración
     AZURE_OPENAI_ENDPOINT: str
     AZURE_OPENAI_API_KEY: str
-    AZURE_OPENAI_API_VERSION: str = "2024-02-01"
+    AZURE_OPENAI_API_VERSION: str = "2024-08-01-preview"
     AZURE_OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-large"
     AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-large"
 
@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     # LandingAI configuración
     LANDINGAI_API_KEY: str
     LANDINGAI_ENVIRONMENT: str = "production"  # "production" o "eu"
+    
+    TAVILY_API_KEY: str
+    
 
     # Schemas storage
     SCHEMAS_DIR: str = "./data/schemas"
