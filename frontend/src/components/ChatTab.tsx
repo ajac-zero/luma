@@ -1,8 +1,3 @@
-import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
 import { Message, MessageContent } from "@/components/ai-elements/message";
 import {
   PromptInput,
@@ -31,8 +26,10 @@ import {
   Bot,
   AlertCircle,
   PaperclipIcon,
+  User,
 } from "lucide-react";
 import { AuditReport } from "./AuditReport";
+import { WebSearchResults } from "./WebSearchResults";
 import { Loader } from "@/components/ai-elements/loader";
 import { DefaultChatTransport } from "ai";
 
@@ -53,6 +50,9 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
   } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/v1/agent/chat",
+      headers: {
+        tema: selectedTema || "",
+      },
     }),
     onError: (error) => {
       setError(`Error en el chat: ${error.message}`);
@@ -103,23 +103,6 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
 
   return (
     <div className="flex flex-col h-[638px] max-h-[638px]">
-      {/* Chat Header */}
-      <div className="border-b border-gray-200 px-6 py-4 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <MessageCircle className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Chat con {selectedTema}
-            </h3>
-            <p className="text-sm text-gray-600">
-              Haz preguntas sobre los documentos de este dataroom
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Chat Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="max-w-4xl mx-auto w-full space-y-6 p-6">
@@ -159,30 +142,60 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                   case "text":
                     return (
                       <Fragment key={`${message.id}-${i}`}>
-                        <Message from={message.role} className="max-w-none">
-                          <MessageContent>
-                            <Response>{part.text}</Response>
-                          </MessageContent>
-                        </Message>
+                        {message.role === "user" ? (
+                          <div className="flex items-start gap-3 justify-end">
+                            <div className="flex-1">
+                              <Message
+                                from={message.role}
+                                className="max-w-none"
+                              >
+                                <MessageContent>
+                                  <Response>{part.text}</Response>
+                                </MessageContent>
+                              </Message>
+                            </div>
+                            <div className="p-2 rounded-full flex-shrink-0 mt-1 bg-gray-100">
+                              <User className="w-4 h-4 text-gray-600" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-full flex-shrink-0 mt-1 bg-blue-100">
+                              <Bot className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <Message
+                                from={message.role}
+                                className="max-w-none"
+                              >
+                                <MessageContent>
+                                  <Response>{part.text}</Response>
+                                </MessageContent>
+                              </Message>
+                            </div>
+                          </div>
+                        )}
                         {message.role === "assistant" &&
                           i === message.parts.length - 1 && (
-                            <Actions className="mt-2">
-                              <Action
-                                onClick={() => regenerate()}
-                                label="Regenerar"
-                                disabled={status === "streaming"}
-                              >
-                                <RefreshCcwIcon className="size-3" />
-                              </Action>
-                              <Action
-                                onClick={() =>
-                                  navigator.clipboard.writeText(part.text)
-                                }
-                                label="Copiar"
-                              >
-                                <CopyIcon className="size-3" />
-                              </Action>
-                            </Actions>
+                            <div className="ml-12">
+                              <Actions className="mt-2">
+                                <Action
+                                  onClick={() => regenerate()}
+                                  label="Regenerar"
+                                  disabled={status === "streaming"}
+                                >
+                                  <RefreshCcwIcon className="size-3" />
+                                </Action>
+                                <Action
+                                  onClick={() =>
+                                    navigator.clipboard.writeText(part.text)
+                                  }
+                                  label="Copiar"
+                                >
+                                  <CopyIcon className="size-3" />
+                                </Action>
+                              </Actions>
+                            </div>
                           )}
                       </Fragment>
                     );
@@ -221,6 +234,51 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                               <AlertCircle className="w-4 h-4 text-red-600" />
                               <span className="text-sm font-medium text-red-800">
                                 Error generando reporte de auditoría
+                              </span>
+                            </div>
+                            <p className="text-sm text-red-600 mt-1">
+                              {part.errorText}
+                            </p>
+                          </div>
+                        );
+                      default:
+                        return null;
+                    }
+                  case "tool-search_web_information":
+                    switch (part.state) {
+                      case "input-available":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="flex items-center gap-2 p-4 bg-green-50 rounded-lg border border-green-200"
+                          >
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                            <span className="text-sm text-green-700">
+                              Searching the web...
+                            </span>
+                          </div>
+                        );
+                      case "output-available":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="mt-4 w-full"
+                          >
+                            <div className="max-w-full overflow-hidden">
+                              <WebSearchResults data={part.output} />
+                            </div>
+                          </div>
+                        );
+                      case "output-error":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-red-600" />
+                              <span className="text-sm font-medium text-red-800">
+                                Error searching the web
                               </span>
                             </div>
                             <p className="text-sm text-red-600 mt-1">

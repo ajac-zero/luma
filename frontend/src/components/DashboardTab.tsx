@@ -281,47 +281,6 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
           </div>
         </div>
       )}
-
-      {/* Collection Details */}
-      {dataroomInfo.collection_info && (
-        <div className="mt-8">
-          <h4 className="text-md font-semibold text-gray-900 mb-4">
-            Detalles de la Colección
-          </h4>
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Vectores
-                </p>
-                <p className="text-lg font-bold text-gray-900">
-                  {dataroomInfo.collection_info.vectors_count}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Vectores Indexados
-                </p>
-                <p className="text-lg font-bold text-gray-900">
-                  {dataroomInfo.collection_info.indexed_vectors_count}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Puntos</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {dataroomInfo.collection_info.points_count}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Segmentos</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {dataroomInfo.collection_info.segments_count}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

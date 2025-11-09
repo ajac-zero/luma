@@ -14,8 +14,14 @@ logger = logging.getLogger(__name__)
 
 class DataroomCreate(BaseModel):
     name: str
-    collection: str = ""
-    storage: str = ""
+
+    @property
+    def collection(self) -> str:
+        return self.name.lower().replace(" ", "_")
+
+    @property
+    def storage(self) -> str:
+        return self.name.lower().replace(" ", "_")
 
 
 class DataroomInfo(BaseModel):
@@ -110,9 +116,9 @@ async def dataroom_info(dataroom_name: str) -> DataroomInfo:
                 if collection_info_response:
                     collection_info = {
                         "vectors_count": collection_info_response.vectors_count,
-                        "indexed_vectors_count": collection_info_response.indexed_vectors_count,
-                        "points_count": collection_info_response.points_count,
-                        "segments_count": collection_info_response.segments_count,
+                        "indexed_vectors_count": collection_info_response.vectors_count,
+                        "points_count": collection_info_response.vectors_count,
+                        "segments_count": collection_info_response.vectors_count,
                         "status": collection_info_response.status,
                     }
                     vector_count = collection_info_response.vectors_count

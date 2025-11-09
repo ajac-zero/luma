@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AlertTriangle,
   CheckCircle,
   XCircle,
   FileText,
-  Building,
-  Calendar,
   AlertCircle,
-  TrendingUp,
+  ChevronDown,
+  ChevronRight,
   Shield,
+  Info,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type Severity = "Pass" | "Warning" | "Error";
 
@@ -45,42 +44,45 @@ interface AuditReportProps {
   data: AuditReportData;
 }
 
-const getSeverityIcon = (severity: Severity) => {
+const getSeverityIcon = (severity: Severity, size = "w-4 h-4") => {
   switch (severity) {
     case "Pass":
-      return <CheckCircle className="w-5 h-5 text-green-600" />;
+      return <CheckCircle className={`${size} text-green-600`} />;
     case "Warning":
-      return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+      return <AlertTriangle className={`${size} text-yellow-600`} />;
     case "Error":
-      return <XCircle className="w-5 h-5 text-red-600" />;
+      return <XCircle className={`${size} text-red-600`} />;
     default:
-      return <AlertCircle className="w-5 h-5 text-gray-600" />;
+      return <AlertCircle className={`${size} text-gray-600`} />;
   }
 };
 
-const getSeverityColor = (severity: Severity) => {
-  switch (severity) {
-    case "Pass":
-      return "text-green-700 bg-green-50 border-green-200";
-    case "Warning":
-      return "text-yellow-700 bg-yellow-50 border-yellow-200";
-    case "Error":
-      return "text-red-700 bg-red-50 border-red-200";
-    default:
-      return "text-gray-700 bg-gray-50 border-gray-200";
-  }
-};
+const getSeverityBadge = (severity: Severity) => {
+  const colors = {
+    Pass: "bg-green-100 text-green-800 border-green-200",
+    Warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    Error: "bg-red-100 text-red-800 border-red-200",
+  };
 
-const getConfidenceColor = (confidence: number) => {
-  if (confidence >= 0.8) return "text-green-600";
-  if (confidence >= 0.6) return "text-yellow-600";
-  return "text-red-600";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${colors[severity]}`}
+    >
+      {getSeverityIcon(severity, "w-3 h-3")}
+      {severity}
+    </span>
+  );
 };
 
 export const AuditReport: React.FC<AuditReportProps> = ({ data }) => {
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(),
+  );
+  const [showAllFindings, setShowAllFindings] = useState(false);
+
   const {
-    organisation_ein,
     organisation_name,
+    organisation_ein,
     year,
     overall_severity,
     findings,
@@ -95,186 +97,227 @@ export const AuditReport: React.FC<AuditReportProps> = ({ data }) => {
     Error: findings.filter((f) => f.severity === "Error").length,
   };
 
+  const toggleSection = (section: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const criticalFindings = findings.filter((f) => f.severity === "Error");
+
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-      <div>
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 p-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Shield className="w-6 h-6 text-blue-600" />
+      {/* Compact Header */}
+      <div className="bg-linear-to-r from-blue-50 to-indigo-50 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-blue-600" />
+            <div>
+              <h3 className="font-semibold text-gray-900">
+                {organisation_name}
+              </h3>
+              <div className="flex items-center gap-3 text-xs text-gray-600">
+                <span>EIN: {organisation_ein}</span>
+                {year && <span>{year}</span>}
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                  <Building className="w-5 h-5" />
-                  {organisation_name}
-                </h2>
-                <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <FileText className="w-4 h-4" />
-                    EIN: {organisation_ein}
-                  </span>
-                  {year && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {year}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Overall Status */}
-            <div
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full border",
-                getSeverityColor(overall_severity),
-              )}
-            >
-              {getSeverityIcon(overall_severity)}
-              <span className="font-medium">{overall_severity}</span>
             </div>
           </div>
+          {getSeverityBadge(overall_severity)}
         </div>
+      </div>
 
-        {/* Statistics Bar */}
-        <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-700">Audit Summary</h3>
-            <div className="flex items-center gap-6 text-sm">
+      {/* Quick Stats */}
+      <div className="bg-gray-50 px-4 py-3 border-b">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">
+            Audit Results
+          </span>
+          <div className="flex items-center gap-4 text-sm">
+            {severityStats.Pass > 0 && (
               <div className="flex items-center gap-1">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-green-700 font-medium">
+                <CheckCircle className="w-3 h-3 text-green-600" />
+                <span className="font-medium text-green-700">
                   {severityStats.Pass}
                 </span>
-                <span className="text-gray-600">Passed</span>
               </div>
+            )}
+            {severityStats.Warning > 0 && (
               <div className="flex items-center gap-1">
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                <span className="text-yellow-700 font-medium">
+                <AlertTriangle className="w-3 h-3 text-yellow-600" />
+                <span className="font-medium text-yellow-700">
                   {severityStats.Warning}
                 </span>
-                <span className="text-gray-600">Warnings</span>
               </div>
+            )}
+            {severityStats.Error > 0 && (
               <div className="flex items-center gap-1">
-                <XCircle className="w-4 h-4 text-red-600" />
-                <span className="text-red-700 font-medium">
+                <XCircle className="w-3 h-3 text-red-600" />
+                <span className="font-medium text-red-700">
                   {severityStats.Error}
                 </span>
-                <span className="text-gray-600">Errors</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Summary */}
+        {overall_summary && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="font-medium text-blue-900 text-sm mb-1">
+                  Summary
+                </h4>
+                <p className="text-sm text-blue-800">{overall_summary}</p>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Overall Summary */}
-        {overall_summary && (
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">
-              Overall Assessment
-            </h3>
-            <p className="text-gray-700 leading-relaxed">{overall_summary}</p>
-          </div>
         )}
 
-        {/* Section Summaries */}
-        {sections.length > 0 && (
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Section Analysis
-            </h3>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {sections.map((section, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "border rounded-lg p-3",
-                    getSeverityColor(section.severity),
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{section.section}</h4>
-                    <div className="flex items-center gap-2">
-                      {getSeverityIcon(section.severity)}
-                      <span
-                        className={cn(
-                          "text-xs font-medium",
-                          getConfidenceColor(section.confidence),
-                        )}
-                      >
-                        {Math.round(section.confidence * 100)}%
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-sm opacity-90">{section.summary}</p>
+        {/* Critical Issues (if any) */}
+        {criticalFindings.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <h4 className="font-medium text-red-900 text-sm mb-2 flex items-center gap-2">
+              <XCircle className="w-4 h-4" />
+              Critical Issues ({criticalFindings.length})
+            </h4>
+            <div className="space-y-2">
+              {criticalFindings.slice(0, 2).map((finding, index) => (
+                <div key={index} className="text-sm text-red-800">
+                  <span className="font-medium">{finding.category}:</span>{" "}
+                  {finding.message}
                 </div>
               ))}
+              {criticalFindings.length > 2 && (
+                <button
+                  onClick={() => setShowAllFindings(!showAllFindings)}
+                  className="text-xs text-red-700 hover:text-red-800 font-medium"
+                >
+                  {showAllFindings
+                    ? "Show less"
+                    : `+${criticalFindings.length - 2} more issues`}
+                </button>
+              )}
             </div>
           </div>
         )}
 
-        {/* Detailed Findings */}
-        <div className="p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Detailed Findings ({findings.length})
-          </h3>
-          <div className="space-y-3">
-            {findings.map((finding, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "border rounded-lg p-3",
-                  getSeverityColor(finding.severity),
-                )}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    {getSeverityIcon(finding.severity)}
-                    <div>
-                      <span className="font-medium">{finding.category}</span>
-                      <span className="text-sm text-gray-500 ml-2">
-                        #{finding.check_id}
+        {/* Sections Overview */}
+        {sections.length > 0 && (
+          <div>
+            <button
+              onClick={() => toggleSection("sections")}
+              className="flex items-center gap-2 w-full text-left p-2 hover:bg-gray-50 rounded-lg"
+            >
+              {expandedSections.has("sections") ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronRight className="w-4 h-4" />
+              )}
+              <span className="font-medium text-sm">
+                Section Analysis ({sections.length})
+              </span>
+            </button>
+
+            {expandedSections.has("sections") && (
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {sections.map((section, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-sm">
+                        {section.section}
                       </span>
+                      <div className="flex items-center gap-1">
+                        {getSeverityIcon(section.severity)}
+                        <span className="text-xs text-gray-600">
+                          {Math.round(section.confidence * 100)}%
+                        </span>
+                      </div>
                     </div>
+                    <p className="text-xs text-gray-700">{section.summary}</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-gray-400" />
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        getConfidenceColor(finding.confidence),
-                      )}
-                    >
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* All Findings */}
+        <div>
+          <button
+            onClick={() => toggleSection("findings")}
+            className="flex items-center gap-2 w-full text-left p-2 hover:bg-gray-50 rounded-lg"
+          >
+            {expandedSections.has("findings") ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+            <span className="font-medium text-sm">
+              All Findings ({findings.length})
+            </span>
+          </button>
+
+          {expandedSections.has("findings") && (
+            <div className="mt-2 space-y-2">
+              {findings.map((finding, index) => (
+                <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {getSeverityIcon(finding.severity)}
+                      <div>
+                        <span className="font-medium text-sm">
+                          {finding.category}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          #{finding.check_id}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-600">
                       {Math.round(finding.confidence * 100)}% confidence
                     </span>
                   </div>
+
+                  <p className="text-sm text-gray-700 mb-2">
+                    {finding.message}
+                  </p>
+
+                  {finding.mitigation && (
+                    <div className="bg-white rounded p-2 border">
+                      <span className="text-xs font-medium text-gray-600">
+                        Recommended:
+                      </span>
+                      <p className="text-xs text-gray-700 mt-1">
+                        {finding.mitigation}
+                      </p>
+                    </div>
+                  )}
                 </div>
-
-                <p className="text-sm mb-2 leading-relaxed">
-                  {finding.message}
-                </p>
-
-                {finding.mitigation && (
-                  <div className="bg-white bg-opacity-50 rounded p-2 border border-current border-opacity-20">
-                    <h5 className="font-medium text-sm mb-1">
-                      Recommended Action:
-                    </h5>
-                    <p className="text-sm">{finding.mitigation}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Notes */}
         {notes && (
-          <div className="bg-gray-50 p-3 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Additional Notes
-            </h3>
-            <p className="text-sm text-gray-600 italic">{notes}</p>
+          <div className="border-t pt-3">
+            <div className="flex items-start gap-2">
+              <FileText className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="font-medium text-gray-700 text-sm mb-1">
+                  Notes
+                </h4>
+                <p className="text-sm text-gray-600 italic">{notes}</p>
+              </div>
+            </div>
           </div>
         )}
       </div>

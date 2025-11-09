@@ -1,0 +1,302 @@
+*2
+$6
+SELECT
+$1
+0
+*24
+$14
+FT._CREATEIFNX
+$23
+extracted_doc:doc:index
+$2
+ON
+$4
+HASH
+$6
+PREFIX
+$1
+1
+$18
+extracted_doc:doc:
+$6
+SCHEMA
+$2
+pk
+$3
+TAG
+$9
+SEPARATOR
+$1
+|
+$9
+file_name
+$3
+TAG
+$9
+SEPARATOR
+$1
+|
+$4
+tema
+$3
+TAG
+$9
+SEPARATOR
+$1
+|
+$15
+collection_name
+$3
+TAG
+$9
+SEPARATOR
+$1
+|
+*3
+$3
+SET
+$28
+extracted_doc:doc:index:hash
+$40
+9de4cb60a645142de3d0f914909eb21259ea256c
+*12
+$14
+FT._CREATEIFNX
+$35
+:app.models.dataroom.DataRoom:index
+$2
+ON
+$4
+HASH
+$6
+PREFIX
+$1
+1
+$30
+:app.models.dataroom.DataRoom:
+$6
+SCHEMA
+$2
+pk
+$3
+TAG
+$9
+SEPARATOR
+$1
+|
+*3
+$3
+SET
+$40
+:app.models.dataroom.DataRoom:index:hash
+$40
+5ba27839f9c1b369df2b0734904dd56c02d2cea5
+*10
+$4
+HSET
+$56
+:app.models.dataroom.DataRoom:01K9J296J6FHT5AKG92D2VX9VW
+$2
+pk
+$26
+01K9J296J6FHT5AKG92D2VX9VW
+$4
+name
+$10
+ABBEY C.U.
+$10
+collection
+$0
+
+$7
+storage
+$0
+
+*2
+$3
+DEL
+$56
+:app.models.dataroom.DataRoom:01K9J296J6FHT5AKG92D2VX9VW
+*10
+$4
+HSET
+$56
+:app.models.dataroom.DataRoom:01K9J2J0A0HPWJQEY0PXFCVPW8
+$2
+pk
+$26
+01K9J2J0A0HPWJQEY0PXFCVPW8
+$4
+name
+$4
+ABBY
+$10
+collection
+$0
+
+$7
+storage
+$0
+
+*2
+$3
+DEL
+$56
+:app.models.dataroom.DataRoom:01K9J2J0A0HPWJQEY0PXFCVPW8
+*10
+$4
+HSET
+$56
+:app.models.dataroom.DataRoom:01K9J2R5ZGS96G60P0G80W248Z
+$2
+pk
+$26
+01K9J2R5ZGS96G60P0G80W248Z
+$4
+name
+$4
+ABBY
+$10
+collection
+$4
+abby
+$7
+storage
+$4
+abby
+*2
+$6
+SELECT
+$1
+0
+*14
+$4
+HSET
+$44
+extracted_doc:doc:01K9J44CG40W28WKNC6RD5QSGM
+$2
+pk
+$26
+01K9J44CG40W28WKNC6RD5QSGM
+$9
+file_name
+$21
+tax_year_2022_990.pdf
+$4
+tema
+$4
+ABBY
+$15
+collection_name
+$4
+ABBY
+$19
+extracted_data_json
+$5684
+{
+  "ein": "31-0329725",
+  "legal_name": "0220 ABBEY CREDIT UNION INC",
+  "phone_number": "(397) 898-7800",
+  "website_url": "www.abbeycu.com",
+  "return_type": "990",
+  "amended_return": "",
+  "group_exemption_number": "",
+  "subsection_code": "501(c)(14)",
+  "ruling_date": "",
+  "accounting_method": "Accrual",
+  "organization_type": "Corporation",
+  "year_of_formation": "1937",
+  "incorporation_state": "OH",
+  "total_revenue": 6146738,
+  "contributions_gifts_grants": 0,
+  "program_service_revenue": 5656278,
+  "membership_dues": 0,
+  "investment_income": 490460,
+  "gains_losses_sales_assets": 0,
+  "rental_income": 0,
+  "related_organizations_revenue": 0,
+  "gaming_revenue": 0,
+  "other_revenue": 0,
+  "government_grants": 0,
+  "foreign_contributions": 0,
+  "total_expenses": 5526970,
+  "program_services_expenses": 386454,
+  "management_general_expenses": 5140516,
+  "fundraising_expenses": 0,
+  "grants_us_organizations": 0,
+  "grants_us_individuals": 0,
+  "grants_foreign_organizations": 0,
+  "grants_foreign_individuals": 0,
+  "compensation_officers": 629393,
+  "compensation_other_staff": 1329887,
+  "payroll_taxes_benefits": 452511,
+  "professional_fees": 96471,
+  "office_occupancy_costs": 292244,
+  "information_technology_costs": 287125,
+  "travel_conference_expenses": 26662,
+  "depreciation_amortization": 236836,
+  "insurance": 39570,
+  "officers_list": [
+    "Lisa Burk, Chief Experience Officer, 40.00 hrs/wk, Officer, $73,286 compensation, $8,931 other compensation",
+    "Eric Stetzel, VP of Business Services, 40.00 hrs/wk, Key employee, $111,064 compensation, $15,979 other compensation",
+    "Dean Pielemeier, CEO, 40.00 hrs/wk, Officer, $212,994 compensation, $20,202 other compensation",
+    "Blanca Criner, Chief Marketing and Business Development Officer, 40.00 hrs/wk, Officer, $121,036 compensation, $4,540 other compensation",
+    "Teri Puthoff, CFO, 40.00 hrs/wk, Officer, $120,962 compensation, $15,754 other compensation",
+    "Michael Thein, Chairman, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Latham Farley, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Steve Wilmoth, Treasurer, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Julie Trick, Secretary, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Michele Blake, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Cheryl Saunders, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Heather Scaggs-Richardson, Vice Chairman, 1.00 hrs/wk, Individual trustee or director, $0 compensation"
+  ],
+  "governing_body_size": 7,
+  "independent_members": 7,
+  "financial_statements_reviewed": "No",
+  "form_990_provided_to_governing_body": "Yes",
+  "conflict_of_interest_policy": "Yes",
+  "whistleblower_policy": "Yes",
+  "document_retention_policy": "Yes",
+  "ceo_compensation_review_process": "Compensation committee, independent compensation consultant, approval by the board or compensation committee",
+  "public_disclosure_practices": "Audited financial statements are handed out each year at the annual meeting. Other documents are not made available to the public unless requested.",
+  "program_accomplishments_list": [
+    "Our mission is to help our members improve their economic well being and quality of life by being competitive convenient and cutting edge.",
+    "Abbey provides checking savings accounts money market accounts certificates of deposit and IRAs. Abbey also offers free atm debit card services wire transfer services mobile banking and insurance related products.",
+    "Abbey provides personal vehicle mortgage and credit card loans to its members."
+  ],
+  "total_fundraising_event_revenue": 0,
+  "total_fundraising_event_expenses": 0,
+  "professional_fundraiser_fees": 0,
+  "number_of_employees": 50,
+  "number_of_volunteers": 7,
+  "occupancy_costs": 132399,
+  "fundraising_method_descriptions": "",
+  "joint_ventures_disregarded_entities": "",
+  "base_compensation": 546779,
+  "bonus": 34415,
+  "incentive": 59692,
+  "other_compensation": 24691,
+  "non_fixed_compensation": "",
+  "first_class_travel": "No",
+  "housing_allowance": "No",
+  "expense_account_usage": "No",
+  "supplemental_retirement": "No",
+  "lobbying_expenditures_direct": 0,
+  "lobbying_expenditures_grassroots": 0,
+  "election_501h_status": "",
+  "political_campaign_expenditures": 0,
+  "related_organizations_affiliates": "",
+  "investment_types": "Publicly traded securities",
+  "donor_restricted_endowment_values": 0,
+  "net_appreciation_depreciation": -2190939,
+  "related_organization_transactions": "",
+  "loans_to_from_related_parties": "Lynn Cook (Retired CEO) Life Insurance loan, $1,400,000; Dean Pielemeier (CEO) Life Insurance loan, $1,239,997",
+  "penalties_excise_taxes_reported": "No",
+  "unrelated_business_income_disclosure": "Yes",
+  "foreign_bank_account_reporting": "No",
+  "schedule_o_narrative_explanations": "Membership to Abbey is open to those who live work worship or attend school in Montgomery Miami Shelby Darke or Greene counties. Abbey CU is owned by the people who open a savings account at Abbey CU. Each member has one vote at the annual election of the Board of Directors. Decisions that require approval: Ohio Division of Financial Institutions Pursuant to regulation. CFO prepares the form and CEO reviews before submitting. Approval of Compensation Committee and Board of Directors for CEO compensation. CEO establishes compensation for Key Employees. Audited financial statements are handed out each year at the annual meeting. Other documents are not made available to the public unless requested."
+}
+$20
+extraction_timestamp
+$26
+2025-11-08T16:17:31.137820

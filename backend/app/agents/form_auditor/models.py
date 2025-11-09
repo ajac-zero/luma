@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import re
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class Severity(str, Enum):
@@ -497,6 +498,214 @@ class TaxCompliancePenalties(BaseModel):
     )
 
 
+_OFFICER_HOURS_PATTERN = re.compile(r"([\d.]+)\s*hrs?/wk", re.IGNORECASE)
+
+
+def _parse_officer_list(entries: list[str] | None) -> list[dict[str, Any]]:
+    if not entries:
+        return []
+    parsed: list[dict[str, Any]] = []
+    for raw in entries:
+        if not isinstance(raw, str):
+            continue
+        parts = [part.strip() for part in raw.split(",")]
+        name = parts[0] if parts else ""
+        title = parts[1] if len(parts) > 1 else ""
+        role = parts[3] if len(parts) > 3 else ""
+        hours = 0.0
+        match = _OFFICER_HOURS_PATTERN.search(raw)
+        if match:
+            try:
+                hours = float(match.group(1))
+            except ValueError:
+                hours = 0.0
+        parsed.append(
+            {
+                "name": name,
+                "title_position": title,
+                "average_hours_per_week": hours,
+                "related_party_transactions": "",
+                "former_officer": "",
+                "governance_role": role,
+            }
+        )
+    return parsed
+
+
+def _build_program_accomplishments(
+    descriptions: list[str] | None,
+) -> list[dict[str, Any]]:
+    if not descriptions:
+        return []
+    programs: list[dict[str, Any]] = []
+    for idx, description in enumerate(descriptions, start=1):
+        if not isinstance(description, str):
+            continue
+        programs.append(
+            {
+                "program_name": f"Program {idx}",
+                "program_description": description.strip(),
+                "expenses": 0.0,
+                "grants": 0.0,
+                "revenue_generated": 0.0,
+                "quantitative_outputs": "",
+            }
+        )
+    return programs
+
+
+def _transform_flat_payload(data: dict[str, Any]) -> dict[str, Any]:
+    def get_str(key: str) -> str:
+        value = data.get(key)
+        if value is None:
+            return ""
+        return str(value)
+
+    def get_value(key: str, default: Any = 0) -> Any:
+        return data.get(key, default)
+
+    transformed: dict[str, Any] = {
+        "core_organization_metadata": {
+            "ein": get_str("ein"),
+            "legal_name": get_str("legal_name"),
+            "phone_number": get_str("phone_number"),
+            "website_url": get_str("website_url"),
+            "return_type": get_str("return_type"),
+            "amended_return": get_str("amended_return"),
+            "group_exemption_number": get_str("group_exemption_number"),
+            "subsection_code": get_str("subsection_code"),
+            "ruling_date": get_str("ruling_date"),
+            "accounting_method": get_str("accounting_method"),
+            "organization_type": get_str("organization_type"),
+            "year_of_formation": get_str("year_of_formation"),
+            "incorporation_state": get_str("incorporation_state"),
+        },
+        "revenue_breakdown": {
+            "total_revenue": get_value("total_revenue"),
+            "contributions_gifts_grants": get_value("contributions_gifts_grants"),
+            "program_service_revenue": get_value("program_service_revenue"),
+            "membership_dues": get_value("membership_dues"),
+            "investment_income": get_value("investment_income"),
+            "gains_losses_sales_assets": get_value("gains_losses_sales_assets"),
+            "rental_income": get_value("rental_income"),
+            "related_organizations_revenue": get_value("related_organizations_revenue"),
+            "gaming_revenue": get_value("gaming_revenue"),
+            "other_revenue": get_value("other_revenue"),
+            "government_grants": get_value("government_grants"),
+            "foreign_contributions": get_value("foreign_contributions"),
+        },
+        "expenses_breakdown": {
+            "total_expenses": get_value("total_expenses"),
+            "program_services_expenses": get_value("program_services_expenses"),
+            "management_general_expenses": get_value("management_general_expenses"),
+            "fundraising_expenses": get_value("fundraising_expenses"),
+            "grants_us_organizations": get_value("grants_us_organizations"),
+            "grants_us_individuals": get_value("grants_us_individuals"),
+            "grants_foreign_organizations": get_value("grants_foreign_organizations"),
+            "grants_foreign_individuals": get_value("grants_foreign_individuals"),
+            "compensation_officers": get_value("compensation_officers"),
+            "compensation_other_staff": get_value("compensation_other_staff"),
+            "payroll_taxes_benefits": get_value("payroll_taxes_benefits"),
+            "professional_fees": get_value("professional_fees"),
+            "office_occupancy_costs": get_value("office_occupancy_costs"),
+            "information_technology_costs": get_value("information_technology_costs"),
+            "travel_conference_expenses": get_value("travel_conference_expenses"),
+            "depreciation_amortization": get_value("depreciation_amortization"),
+            "insurance": get_value("insurance"),
+        },
+        "balance_sheet": data.get("balance_sheet") or {},
+        "officers_directors_trustees_key_employees": _parse_officer_list(
+            data.get("officers_list")
+        ),
+        "governance_management_disclosure": {
+            "governing_body_size": get_value("governing_body_size"),
+            "independent_members": get_value("independent_members"),
+            "financial_statements_reviewed": get_str("financial_statements_reviewed"),
+            "form_990_provided_to_governing_body": get_str(
+                "form_990_provided_to_governing_body"
+            ),
+            "conflict_of_interest_policy": get_str("conflict_of_interest_policy"),
+            "whistleblower_policy": get_str("whistleblower_policy"),
+            "document_retention_policy": get_str("document_retention_policy"),
+            "ceo_compensation_review_process": get_str(
+                "ceo_compensation_review_process"
+            ),
+            "public_disclosure_practices": get_str("public_disclosure_practices"),
+        },
+        "program_service_accomplishments": _build_program_accomplishments(
+            data.get("program_accomplishments_list")
+        ),
+        "fundraising_grantmaking": {
+            "total_fundraising_event_revenue": get_value(
+                "total_fundraising_event_revenue"
+            ),
+            "total_fundraising_event_expenses": get_value(
+                "total_fundraising_event_expenses"
+            ),
+            "professional_fundraiser_fees": get_value("professional_fundraiser_fees"),
+        },
+        "functional_operational_data": {
+            "number_of_employees": get_value("number_of_employees"),
+            "number_of_volunteers": get_value("number_of_volunteers"),
+            "occupancy_costs": get_value("occupancy_costs"),
+            "fundraising_method_descriptions": get_str(
+                "fundraising_method_descriptions"
+            ),
+            "joint_ventures_disregarded_entities": get_str(
+                "joint_ventures_disregarded_entities"
+            ),
+        },
+        "compensation_details": {
+            "base_compensation": get_value("base_compensation"),
+            "bonus": get_value("bonus"),
+            "incentive": get_value("incentive"),
+            "other": get_value("other_compensation", get_value("other", 0)),
+            "non_fixed_compensation": get_str("non_fixed_compensation"),
+            "first_class_travel": get_str("first_class_travel"),
+            "housing_allowance": get_str("housing_allowance"),
+            "expense_account_usage": get_str("expense_account_usage"),
+            "supplemental_retirement": get_str("supplemental_retirement"),
+        },
+        "political_lobbying_activities": {
+            "lobbying_expenditures_direct": get_value("lobbying_expenditures_direct"),
+            "lobbying_expenditures_grassroots": get_value(
+                "lobbying_expenditures_grassroots"
+            ),
+            "election_501h_status": get_str("election_501h_status"),
+            "political_campaign_expenditures": get_value(
+                "political_campaign_expenditures"
+            ),
+            "related_organizations_affiliates": get_str(
+                "related_organizations_affiliates"
+            ),
+        },
+        "investments_endowment": {
+            "investment_types": get_str("investment_types"),
+            "donor_restricted_endowment_values": get_value(
+                "donor_restricted_endowment_values"
+            ),
+            "net_appreciation_depreciation": get_value("net_appreciation_depreciation"),
+            "related_organization_transactions": get_str(
+                "related_organization_transactions"
+            ),
+            "loans_to_from_related_parties": get_str("loans_to_from_related_parties"),
+        },
+        "tax_compliance_penalties": {
+            "penalties_excise_taxes_reported": get_str(
+                "penalties_excise_taxes_reported"
+            ),
+            "unrelated_business_income_disclosure": get_str(
+                "unrelated_business_income_disclosure"
+            ),
+            "foreign_bank_account_reporting": get_str("foreign_bank_account_reporting"),
+            "schedule_o_narrative_explanations": get_str(
+                "schedule_o_narrative_explanations"
+            ),
+        },
+    }
+    return transformed
+
+
 class ExtractedIrsForm990PfDataSchema(BaseModel):
     core_organization_metadata: CoreOrganizationMetadata = Field(
         ...,
@@ -514,7 +723,7 @@ class ExtractedIrsForm990PfDataSchema(BaseModel):
         title="Expenses Breakdown",
     )
     balance_sheet: dict[str, Any] = Field(
-        ...,
+        default_factory=dict,
         description="Assets, liabilities, and net assets at year end.",
         title="Balance Sheet Data",
     )
@@ -565,6 +774,15 @@ class ExtractedIrsForm990PfDataSchema(BaseModel):
         description="Tax compliance indicators, penalties, and narrative explanations.",
         title="Tax Compliance / Penalties",
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _ensure_structure(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "core_organization_metadata" in value:
+            return value
+        return _transform_flat_payload(value)
 
 
 class ValidatorState(BaseModel):

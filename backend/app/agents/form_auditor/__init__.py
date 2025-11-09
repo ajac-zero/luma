@@ -11,15 +11,23 @@ from .models import (
 
 
 async def build_audit_report(payload: dict[str, Any]) -> AuditReport:
-    extraction_payload = payload.get("extraction")
+    metadata_raw: Any = None
+    extraction_payload: Any = None
+
+    if isinstance(payload, dict) and "extraction" in payload:
+        extraction_payload = payload.get("extraction")
+        metadata_raw = payload.get("metadata")
+    else:
+        extraction_payload = payload
+
     if extraction_payload is None:
-        raise ValueError("Payload missing 'extraction' key.")
+        raise ValueError("Payload missing extraction data.")
+
     extraction = ExtractedIrsForm990PfDataSchema.model_validate(extraction_payload)
 
     initial_findings = prepare_initial_findings(extraction)
 
     metadata: dict[str, Any] = {}
-    metadata_raw = payload.get("metadata")
     if isinstance(metadata_raw, dict):
         metadata = {str(k): v for k, v in metadata_raw.items()}
 
