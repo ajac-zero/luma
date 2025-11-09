@@ -59,9 +59,8 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
       const info = await api.getDataroomInfo(selectedTema);
       setDataroomInfo(info);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(`Error cargando información: ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(`Unable to load dataroom info: ${errorMessage}`);
       console.error("Error fetching dataroom info:", err);
     } finally {
       setLoading(false);
@@ -70,7 +69,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
 
   const formatFileTypes = (fileTypes: Record<string, number>) => {
     const entries = Object.entries(fileTypes);
-    if (entries.length === 0) return "Sin archivos";
+    if (entries.length === 0) return "No files";
 
     return entries
       .sort(([, a], [, b]) => b - a) // Sort by count descending
@@ -90,9 +89,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <Activity className="w-12 h-12 text-gray-400 mb-4" />
-        <p className="text-gray-500">
-          Selecciona un dataroom para ver las métricas
-        </p>
+        <p className="text-gray-500">Select a dataroom to view its metrics</p>
       </div>
     );
   }
@@ -101,7 +98,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
-        <p className="text-gray-600">Cargando métricas...</p>
+        <p className="text-gray-600">Loading metrics…</p>
       </div>
     );
   }
@@ -124,24 +121,14 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <AlertCircle className="w-12 h-12 text-gray-400 mb-4" />
-        <p className="text-gray-500">
-          No se pudo cargar la información del dataroom
-        </p>
+        <p className="text-gray-500">Unable to load dataroom information</p>
       </div>
     );
   }
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Métricas del Dataroom: {selectedTema}
-        </h3>
-        <p className="text-sm text-gray-600">
-          Vista general del estado y actividad del dataroom
-        </p>
-      </div>
-
+      <h4 className="text-md font-semibold text-gray-900 mb-4">Metrics</h4>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Files Count Card */}
         <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -150,7 +137,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Archivos</p>
+              <p className="text-sm font-medium text-gray-600">Files</p>
               <p className="text-2xl font-bold text-gray-900">
                 {dataroomInfo.file_count}
               </p>
@@ -168,9 +155,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
               <Database className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Almacenamiento
-              </p>
+              <p className="text-sm font-medium text-gray-600">Storage</p>
               <p className="text-2xl font-bold text-gray-900">
                 {dataroomInfo.total_size_mb.toFixed(1)} MB
               </p>
@@ -188,14 +173,14 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
               <Activity className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Vectores</p>
+              <p className="text-sm font-medium text-gray-600">Vectors</p>
               <p className="text-2xl font-bold text-gray-900">
                 {dataroomInfo.vector_count ?? 0}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 {dataroomInfo.collection_exists
-                  ? "Vectores indexados"
-                  : "Sin vectores"}
+                  ? "Indexed vectors"
+                  : "No vectors"}
               </p>
             </div>
           </div>
@@ -208,10 +193,10 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
               <TrendingUp className="w-5 h-5 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-600">Estado</p>
+              <p className="text-sm font-medium text-gray-600">Status</p>
               <div className="flex items-center gap-2">
                 <p className="text-2xl font-bold text-gray-900">
-                  {dataroomInfo.collection_exists ? "Activo" : "Inactivo"}
+                  {dataroomInfo.collection_exists ? "Active" : "Inactive"}
                 </p>
                 {dataroomInfo.collection_exists ? (
                   <CheckCircle className="w-6 h-6 text-green-600" />
@@ -222,14 +207,13 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
               {dataroomInfo.collection_info ? (
                 <p className="text-xs text-gray-500 mt-1">
                   {dataroomInfo.collection_info.indexed_vectors_count}/
-                  {dataroomInfo.collection_info.vectors_count} vectores
-                  indexados
+                  {dataroomInfo.collection_info.vectors_count} indexed vectors
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 mt-1">
                   {dataroomInfo.collection_exists
-                    ? "Colección sin datos"
-                    : "Sin colección"}
+                    ? "Collection has no data"
+                    : "No collection"}
                 </p>
               )}
             </div>
@@ -241,7 +225,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
       {dataroomInfo.recent_files.length > 0 && (
         <div className="mt-8">
           <h4 className="text-md font-semibold text-gray-900 mb-4">
-            Archivos Recientes
+            Recent Files
           </h4>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             <div className="divide-y divide-gray-200">
@@ -258,7 +242,7 @@ export function DashboardTab({ selectedTema }: DashboardTabProps) {
                       </p>
                       <p className="text-xs text-gray-500">
                         {new Date(file.last_modified).toLocaleDateString(
-                          "es-ES",
+                          "en-US",
                           {
                             year: "numeric",
                             month: "short",

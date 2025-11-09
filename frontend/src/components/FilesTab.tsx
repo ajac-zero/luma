@@ -60,7 +60,7 @@ export function FilesTab({
   const [deleting, setDeleting] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
-  // Estados para el modal de preview de PDF
+  // PDF preview modal state
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewFileUrl, setPreviewFileUrl] = useState<string | null>(null);
   const [previewFileName, setPreviewFileName] = useState("");
@@ -69,12 +69,12 @@ export function FilesTab({
   );
   const [loadingPreview, setLoadingPreview] = useState(false);
 
-  // Estados para el modal de chunks
+  // Chunk viewer modal state
   const [chunkViewerOpen, setChunkViewerOpen] = useState(false);
   const [chunkFileName, setChunkFileName] = useState("");
   const [chunkFileTema, setChunkFileTema] = useState("");
 
-  // Estados para chunking
+  // LandingAI chunking state
   const [chunkingConfigOpen, setChunkingConfigOpen] = useState(false);
   const [chunkingFileName, setChunkingFileName] = useState("");
   const [chunkingFileTema, setChunkingFileTema] = useState("");
@@ -123,10 +123,10 @@ export function FilesTab({
       setDeleting(true);
 
       if (fileToDelete) {
-        // Eliminar archivo individual
+        // Delete single file
         await api.deleteFile(fileToDelete, selectedTema || undefined);
       } else {
-        // Eliminar archivos seleccionados
+        // Delete selected files
         const filesToDelete = Array.from(selectedFiles);
         await api.deleteFiles(filesToDelete, selectedTema || undefined);
         clearSelection();
@@ -159,9 +159,7 @@ export function FilesTab({
     try {
       setDownloading(true);
       const filesToDownload = Array.from(selectedFiles);
-      const zipName = selectedTema
-        ? `${selectedTema}_archivos`
-        : "archivos_seleccionados";
+      const zipName = selectedTema ? `${selectedTema}_files` : "selected_files";
       await api.downloadMultipleFiles(
         filesToDownload,
         selectedTema || undefined,
@@ -234,7 +232,7 @@ export function FilesTab({
     }
   };
 
-  // Filtrar archivos por término de búsqueda
+  // Filter files by search term
   const filteredFiles = files.filter((file) =>
     file.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -250,7 +248,7 @@ export function FilesTab({
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
+    return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -262,15 +260,15 @@ export function FilesTab({
   const getDeleteDialogProps = () => {
     if (fileToDelete) {
       return {
-        title: "Eliminar archivo",
-        message: `¿Estás seguro de que deseas eliminar el archivo "${fileToDelete}"?`,
+        title: "Delete file",
+        message: `Are you sure you want to delete "${fileToDelete}"?`,
         fileList: [fileToDelete],
       };
     } else {
       const filesToDelete = Array.from(selectedFiles);
       return {
-        title: "Eliminar archivos seleccionados",
-        message: `¿Estás seguro de que deseas eliminar ${filesToDelete.length} archivo${filesToDelete.length > 1 ? "s" : ""}?`,
+        title: "Delete selected files",
+        message: `Are you sure you want to delete ${filesToDelete.length} file${filesToDelete.length > 1 ? "s" : ""}?`,
         fileList: filesToDelete,
       };
     }
@@ -280,9 +278,7 @@ export function FilesTab({
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <FileText className="w-12 h-12 text-gray-400 mb-4" />
-        <p className="text-gray-500">
-          Selecciona un dataroom para ver sus archivos
-        </p>
+        <p className="text-gray-500">Select a dataroom to view its files</p>
       </div>
     );
   }
@@ -294,7 +290,7 @@ export function FilesTab({
           <div className="flex items-center gap-3">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
             <span className="text-sm text-blue-800">
-              Procesando archivos con LandingAI...
+              Processing files with LandingAI…
             </span>
           </div>
         </div>
@@ -305,7 +301,7 @@ export function FilesTab({
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Buscar archivos..."
+              placeholder="Search files..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -324,7 +320,7 @@ export function FilesTab({
                   className="gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  Descargar ({selectedFiles.size})
+                  Download ({selectedFiles.size})
                 </Button>
                 <Button
                   variant="outline"
@@ -334,7 +330,7 @@ export function FilesTab({
                   className="gap-2 text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Eliminar ({selectedFiles.size})
+                  Delete ({selectedFiles.size})
                 </Button>
               </>
             )}
@@ -345,7 +341,7 @@ export function FilesTab({
               className="gap-2"
             >
               <Upload className="w-4 h-4" />
-              Subir archivo
+              Upload files
             </Button>
           </div>
         </div>
@@ -355,17 +351,17 @@ export function FilesTab({
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <p className="text-gray-500">Cargando archivos...</p>
+              <p className="text-gray-500">Loading files…</p>
             </div>
           ) : filteredFiles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64">
               <FileText className="w-12 h-12 text-gray-400 mb-4" />
               <p className="text-gray-500">
                 {!selectedTema
-                  ? "Selecciona un dataroom para ver sus archivos"
+                  ? "Select a dataroom to view its files"
                   : searchTerm
-                    ? "No se encontraron archivos"
-                    : "No hay archivos en este dataroom"}
+                    ? "No files match your search"
+                    : "This dataroom has no files yet"}
               </p>
             </div>
           ) : (
@@ -387,10 +383,10 @@ export function FilesTab({
                       }}
                     />
                   </TableHead>
-                  <TableHead>Archivo</TableHead>
-                  <TableHead>Tamaño</TableHead>
-                  <TableHead>Modificado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>File</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Modified</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -418,7 +414,7 @@ export function FilesTab({
                           onClick={() => handlePreviewFile(file.name)}
                           disabled={loadingPreview}
                           className="h-8 w-8 p-0"
-                          title="Vista previa"
+                          title="Preview"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -427,7 +423,7 @@ export function FilesTab({
                           size="sm"
                           onClick={() => handleViewChunks(file.name)}
                           className="h-8 w-8 p-0"
-                          title="Ver chunks"
+                          title="View chunks"
                         >
                           <MessageSquare className="w-4 h-4" />
                         </Button>
@@ -436,7 +432,7 @@ export function FilesTab({
                           size="sm"
                           onClick={() => handleStartChunking(file.name)}
                           className="h-8 w-8 p-0"
-                          title="Procesar con LandingAI"
+                          title="Process with LandingAI"
                         >
                           <Scissors className="w-4 h-4" />
                         </Button>
@@ -446,7 +442,7 @@ export function FilesTab({
                           onClick={() => handleDownloadFile(file.name)}
                           disabled={downloading}
                           className="h-8 w-8 p-0"
-                          title="Descargar"
+                          title="Download"
                         >
                           <Download className="w-4 h-4" />
                         </Button>
@@ -456,7 +452,7 @@ export function FilesTab({
                           onClick={() => handleDeleteFile(file.name)}
                           disabled={deleting}
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          title="Eliminar"
+                          title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -503,7 +499,7 @@ export function FilesTab({
         tema={chunkFileTema}
       />
 
-      {/* Modal de configuración de chunking con LandingAI */}
+      {/* LandingAI chunking config modal */}
       <ChunkingConfigModalLandingAI
         isOpen={chunkingConfigOpen}
         onClose={() => setChunkingConfigOpen(false)}

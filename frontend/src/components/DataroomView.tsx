@@ -87,14 +87,12 @@ export function DataroomView({ onProcessingChange }: DataroomViewProps = {}) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              {selectedTema
-                ? `Dataroom: ${selectedTema}`
-                : "Selecciona un dataroom"}
+              {selectedTema ? `Dataroom: ${selectedTema}` : "Select a dataroom"}
             </h2>
             <p className="text-sm text-gray-600">
               {selectedTema
-                ? "Gestiona archivos, consulta métricas y chatea con IA sobre el contenido"
-                : "Selecciona un dataroom de la barra lateral para comenzar"}
+                ? "Manage files, review metrics, and chat with AI about the content."
+                : "Pick a dataroom from the sidebar to get started."}
             </p>
           </div>
         </div>

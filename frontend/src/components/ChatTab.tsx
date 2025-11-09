@@ -16,7 +16,7 @@ import {
   PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
 import { Action, Actions } from "@/components/ai-elements/actions";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
 import { Response } from "@/components/ai-elements/response";
 import {
@@ -56,7 +56,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
       },
     }),
     onError: (error) => {
-      setError(`Error en el chat: ${error.message}`);
+      setError(`Chat error: ${error.message}`);
     },
   });
 
@@ -84,20 +84,32 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
       {
         body: {
           dataroom: selectedTema,
-          context: `Usuario está consultando sobre el dataroom: ${selectedTema}`,
+          context: `User is asking about the dataroom: ${selectedTema}`,
         },
       },
     );
     setInput("");
   };
 
+  const hasActiveToolRequest = useMemo(() => {
+    return messages.some((message) =>
+      message.parts.some(
+        (part: any) =>
+          typeof part?.type === "string" &&
+          part.type.startsWith("tool-") &&
+          part.state === "input-available",
+      ),
+    );
+  }, [messages]);
+
+  const shouldShowGlobalLoader =
+    (status === "streaming" || status === "loading") && !hasActiveToolRequest;
+
   if (!selectedTema) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <MessageCircle className="w-12 h-12 text-gray-400 mb-4" />
-        <p className="text-gray-500">
-          Selecciona un dataroom para iniciar el chat
-        </p>
+        <p className="text-gray-500">Select a dataroom to start chatting</p>
       </div>
     );
   }
@@ -115,9 +127,9 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
               </div>
               <div className="flex-1 bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-800">
-                  ¡Hola! Soy tu asistente de IA para el dataroom{" "}
-                  <strong>{selectedTema}</strong>. Puedes hacerme preguntas
-                  sobre los documentos almacenados aquí.
+                  Hi! I’m your AI assistant for dataroom{" "}
+                  <strong>{selectedTema}</strong>. Ask me anything about the
+                  stored documents.
                 </p>
               </div>
             </div>
@@ -206,11 +218,11 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200"
+                            className="mb-4 flex items-center gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200"
                           >
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                             <span className="text-sm text-blue-700">
-                              Generando reporte de auditoría...
+                              Generating audit report…
                             </span>
                           </div>
                         );
@@ -218,7 +230,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="mt-4 w-full"
+                            className="mt-4 mb-4 w-full"
                           >
                             <div className="max-w-full overflow-hidden">
                               <AuditReport data={part.output} />
@@ -229,12 +241,12 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                            className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
                           >
                             <div className="flex items-center gap-2">
                               <AlertCircle className="w-4 h-4 text-red-600" />
                               <span className="text-sm font-medium text-red-800">
-                                Error generando reporte de auditoría
+                                Failed to generate audit report
                               </span>
                             </div>
                             <p className="text-sm text-red-600 mt-1">
@@ -251,11 +263,11 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="flex items-center gap-2 p-4 bg-purple-50 rounded-lg border border-purple-200"
+                            className="mb-4 flex items-center gap-2 p-4 bg-purple-50 rounded-lg border border-purple-200"
                           >
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
                             <span className="text-sm text-purple-700">
-                              Generando análisis histórico...
+                              Generating performance analysis…
                             </span>
                           </div>
                         );
@@ -263,7 +275,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="mt-4 w-full"
+                            className="mt-4 mb-4 w-full"
                           >
                             <div className="max-w-full overflow-hidden">
                               <AnalystReport data={part.output} />
@@ -274,12 +286,12 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                            className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
                           >
                             <div className="flex items-center gap-2">
                               <AlertCircle className="w-4 h-4 text-red-600" />
                               <span className="text-sm font-medium text-red-800">
-                                Error generando análisis histórico
+                                Failed to generate performance analysis
                               </span>
                             </div>
                             <p className="text-sm text-red-600 mt-1">
@@ -296,11 +308,11 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="flex items-center gap-2 p-4 bg-green-50 rounded-lg border border-green-200"
+                            className="mb-4 flex items-center gap-2 p-4 bg-green-50 rounded-lg border border-green-200"
                           >
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
                             <span className="text-sm text-green-700">
-                              Searching the web...
+                              Searching the web…
                             </span>
                           </div>
                         );
@@ -308,7 +320,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="mt-4 w-full"
+                            className="mt-4 mb-4 w-full"
                           >
                             <div className="max-w-full overflow-hidden">
                               <WebSearchResults data={part.output} />
@@ -319,12 +331,12 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                         return (
                           <div
                             key={`${message.id}-${i}`}
-                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                            className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
                           >
                             <div className="flex items-center gap-2">
                               <AlertCircle className="w-4 h-4 text-red-600" />
                               <span className="text-sm font-medium text-red-800">
-                                Error searching the web
+                                Failed to search the web
                               </span>
                             </div>
                             <p className="text-sm text-red-600 mt-1">
@@ -341,8 +353,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
               })}
             </div>
           ))}
-          {status === "streaming" && <Loader />}
-          {status === "loading" && <Loader />}
+          {shouldShowGlobalLoader && <Loader />}
         </div>
       </div>
 
@@ -363,7 +374,7 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
             <PromptInputTextarea
               onChange={(e) => setInput(e.target.value)}
               value={input}
-              placeholder={`Pregunta algo sobre ${selectedTema}...`}
+              placeholder={`Ask something about ${selectedTema}...`}
               disabled={status === "streaming" || status === "loading"}
               className="min-h-[60px] resize-none border-0 focus:ring-0 transition-all duration-200 text-base px-4 py-3 bg-white rounded-xl"
             />

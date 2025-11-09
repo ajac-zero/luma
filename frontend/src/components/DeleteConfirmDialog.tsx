@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,17 +6,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Trash2, AlertTriangle } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Trash2, AlertTriangle } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  title: string
-  description: string
-  fileList?: string[]
-  loading?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  fileList?: string[];
+  loading?: boolean;
 }
 
 export function DeleteConfirmDialog({
@@ -26,7 +26,7 @@ export function DeleteConfirmDialog({
   title,
   description,
   fileList,
-  loading = false
+  loading = false,
 }: DeleteConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -41,7 +41,7 @@ export function DeleteConfirmDialog({
 
         {fileList && fileList.length > 0 && (
           <div className="max-h-40 overflow-y-auto bg-gray-50 rounded p-3">
-            <p className="text-sm font-medium mb-2">Archivos a eliminar:</p>
+            <p className="text-sm	font-medium mb-2">Files to delete:</p>
             <ul className="text-sm space-y-1">
               {fileList.map((filename, index) => (
                 <li key={index} className="flex items-center gap-2">
@@ -59,17 +59,13 @@ export function DeleteConfirmDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            Cancelar
+            Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={loading}
-          >
-            {loading ? 'Eliminando...' : 'Eliminar'}
+          <Button variant="destructive" onClick={onConfirm} disabled={loading}>
+            {loading ? "Deleting…" : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

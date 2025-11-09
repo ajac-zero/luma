@@ -84,7 +84,7 @@ export function Sidebar({
   const handleCreateDataroom = async () => {
     const trimmed = newDataroomName.trim();
     if (!trimmed) {
-      setCreateError("El nombre es obligatorio");
+      setCreateError("Name is required");
       return;
     }
 
@@ -108,7 +108,7 @@ export function Sidebar({
       setCreateError(
         error instanceof Error
           ? error.message
-          : "No se pudo crear el dataroom. Inténtalo nuevamente.",
+          : "Could not create the dataroom. Please try again.",
       );
     } finally {
       setCreatingDataroom(false);
@@ -168,15 +168,15 @@ export function Sidebar({
     tema: string,
     e: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    e.stopPropagation(); // Evitar que se seleccione el tema al hacer clic en el icono
+    e.stopPropagation(); // Prevent selecting the dataroom when clicking delete
 
     const confirmed = window.confirm(
-      `¿Estás seguro de que deseas eliminar el dataroom "${tema}"?\n\n` +
-        `Esto eliminará:\n` +
-        `• El dataroom de la base de datos\n` +
-        `• Todos los archivos del tema en Azure Blob Storage\n` +
-        `• La colección "${tema}" en Qdrant (si existe)\n\n` +
-        `Esta acción no se puede deshacer.`,
+      `Are you sure you want to delete the dataroom "${tema}"?\n\n` +
+        `This will remove:\n` +
+        `• The dataroom from the database\n` +
+        `• All files stored for this topic in Azure Blob Storage\n` +
+        `• The "${tema}" collection in Qdrant (if it exists)\n\n` +
+        `This action cannot be undone.`,
     );
 
     if (!confirmed) return;
@@ -191,10 +191,10 @@ export function Sidebar({
         console.error(`Error deleting dataroom "${tema}":`, error);
         // If dataroom deletion fails, fall back to legacy deletion
 
-        // Eliminar todos los archivos del tema en Azure Blob Storage
+        // Delete all topic files in Azure Blob Storage
         await api.deleteTema(tema);
 
-        // Intentar eliminar la colección en Qdrant (si existe)
+        // Attempt to delete the Qdrant collection (if it exists)
         try {
           const collectionExists = await api.checkCollectionExists(tema);
           if (collectionExists.exists) {
@@ -202,7 +202,7 @@ export function Sidebar({
           }
         } catch (collectionError) {
           console.warn(
-            `No se pudo eliminar la colección "${tema}" de Qdrant:`,
+            `Could not delete the "${tema}" collection from Qdrant:`,
             collectionError,
           );
         }
@@ -216,9 +216,9 @@ export function Sidebar({
         setSelectedTema(null);
       }
     } catch (error) {
-      console.error(`Error eliminando dataroom "${tema}":`, error);
+      console.error(`Error deleting dataroom "${tema}":`, error);
       alert(
-        `Error al eliminar el dataroom: ${error instanceof Error ? error.message : "Error desconocido"}`,
+        `Unable to delete dataroom: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
       setDeletingTema(null);
@@ -251,9 +251,7 @@ export function Sidebar({
               className="text-slate-400 hover:text-slate-100"
               onClick={onToggleCollapse}
               disabled={disabled}
-              aria-label={
-                collapsed ? "Expandir barra lateral" : "Contraer barra lateral"
-              }
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? (
                 <ChevronRight className="h-4 w-4" />
@@ -279,7 +277,7 @@ export function Sidebar({
                 </h2>
               )}
               {renderWithTooltip(
-                "Crear dataroom",
+                "Create",
                 <Button
                   variant="ghost"
                   size="sm"
@@ -293,15 +291,15 @@ export function Sidebar({
                   disabled={disabled || creatingDataroom}
                 >
                   <Plus className="h-4 w-4" />
-                  {!collapsed && <span>Crear dataroom</span>}
+                  {!collapsed && <span>Create</span>}
                 </Button>,
               )}
             </div>
 
-            {/* Lista de temas */}
+            {/* Dataroom list */}
             {loading ? (
               <div className="text-sm text-slate-400 px-3 py-2 text-center">
-                {collapsed ? "..." : "Cargando..."}
+                {collapsed ? "..." : "Loading..."}
               </div>
             ) : Array.isArray(temas) && temas.length > 0 ? (
               temas.map((tema) => (
@@ -331,7 +329,7 @@ export function Sidebar({
                       onClick={(e) => handleDeleteTema(tema, e)}
                       disabled={deletingTema === tema || disabled}
                       className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
-                      title="Eliminar dataroom y colección"
+                      title="Delete dataroom and collection"
                     >
                       <Trash2 className="h-4 w-4 text-red-400" />
                     </button>
@@ -341,8 +339,8 @@ export function Sidebar({
             ) : (
               <div className="text-sm text-slate-400 px-3 py-2 text-center">
                 {Array.isArray(temas) && temas.length === 0
-                  ? "No hay datarooms"
-                  : "Cargando datarooms..."}
+                  ? "No datarooms found"
+                  : "Loading datarooms..."}
               </div>
             )}
           </div>
@@ -357,7 +355,7 @@ export function Sidebar({
         >
           {onNavigateToSchemas &&
             renderWithTooltip(
-              "Gestionar Schemas",
+              "Manage schemas",
               <Button
                 variant="default"
                 size="sm"
@@ -370,12 +368,12 @@ export function Sidebar({
               >
                 <Database className={cn("h-4 w-4", !collapsed && "mr-2")} />
                 <span className={cn(collapsed && "sr-only")}>
-                  Gestionar Schemas
+                  Manage Schemas
                 </span>
               </Button>,
             )}
           {renderWithTooltip(
-            "Actualizar datarooms",
+            "Refresh datarooms",
             <Button
               variant="ghost"
               size="sm"
@@ -388,7 +386,7 @@ export function Sidebar({
             >
               <RefreshCcw className={cn("mr-2 h-4 w-4", collapsed && "mr-0")} />
               <span className={cn(collapsed && "sr-only")}>
-                Actualizar datarooms
+                Refresh datarooms
               </span>
             </Button>,
           )}
@@ -403,14 +401,14 @@ export function Sidebar({
           aria-describedby="create-dataroom-description"
         >
           <DialogHeader>
-            <DialogTitle>Crear dataroom</DialogTitle>
+            <DialogTitle>Create dataroom</DialogTitle>
             <DialogDescription id="create-dataroom-description">
-              Define un nombre único para organizar tus archivos.
+              Choose a unique name to organize your files.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="dataroom-name">Nombre del dataroom</Label>
+              <Label htmlFor="dataroom-name">Dataroom name</Label>
               <Input
                 id="dataroom-name"
                 value={newDataroomName}
@@ -420,7 +418,7 @@ export function Sidebar({
                     setCreateError(null);
                   }
                 }}
-                placeholder="Ej: normativa, contratos, fiscal..."
+                placeholder="e.g., policies, contracts, finance..."
                 autoFocus
               />
               {createError && (
@@ -434,13 +432,13 @@ export function Sidebar({
               onClick={() => handleCreateDialogOpenChange(false)}
               disabled={creatingDataroom}
             >
-              Cancelar
+              Cancel
             </Button>
             <Button
               onClick={handleCreateDataroom}
               disabled={creatingDataroom || newDataroomName.trim() === ""}
             >
-              {creatingDataroom ? "Creando..." : "Crear dataroom"}
+              {creatingDataroom ? "Creating…" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>

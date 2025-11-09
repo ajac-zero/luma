@@ -1,25 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import {
-  Download,
-  Loader2,
-  FileText,
-  ExternalLink
-} from 'lucide-react'
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Download, Loader2, FileText, ExternalLink } from "lucide-react";
 
 interface PDFPreviewModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  fileUrl: string | null
-  fileName: string
-  onDownload?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  fileUrl: string | null;
+  fileName: string;
+  onDownload?: () => void;
 }
 
 export function PDFPreviewModal({
@@ -27,45 +22,40 @@ export function PDFPreviewModal({
   onOpenChange,
   fileUrl,
   fileName,
-  onDownload
+  onDownload,
 }: PDFPreviewModalProps) {
-  // Estado para manejar el loading del iframe
-  const [loading, setLoading] = useState(true)
+  // Track iframe loading state
+  const [loading, setLoading] = useState(true);
 
-  // Efecto para manejar el timeout del loading
+  // Hide loading if iframe never fires onLoad
   useEffect(() => {
     if (open && fileUrl) {
-      setLoading(true)
+      setLoading(true);
 
-      // Timeout para ocultar loading automáticamente después de 3 segundos
-      // Algunos iframes no disparan onLoad correctamente
       const timeout = setTimeout(() => {
-        setLoading(false)
-      }, 3000)
+        setLoading(false);
+      }, 3000);
 
-      return () => clearTimeout(timeout)
+      return () => clearTimeout(timeout);
     }
-  }, [open, fileUrl])
+  }, [open, fileUrl]);
 
-  // Manejar cuando el iframe termina de cargar
   const handleIframeLoad = () => {
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  // Abrir PDF en nueva pestaña
   const openInNewTab = () => {
     if (fileUrl) {
-      window.open(fileUrl, '_blank')
+      window.open(fileUrl, "_blank");
     }
-  }
+  };
 
-  // Reiniciar loading cuando cambia el archivo
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      setLoading(true)
+      setLoading(true);
     }
-    onOpenChange(open)
-  }
+    onOpenChange(open);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -75,81 +65,68 @@ export function PDFPreviewModal({
             <FileText className="w-5 h-5" />
             {fileName}
           </DialogTitle>
-          <DialogDescription>
-            Vista previa del documento PDF
-          </DialogDescription>
+          <DialogDescription>PDF preview</DialogDescription>
         </DialogHeader>
 
-        {/* Barra de controles */}
+        {/* Controls */}
         <div className="flex items-center justify-between gap-4 px-6 py-3 border-b bg-gray-50">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={openInNewTab}
-              title="Abrir en nueva pestaña"
+              title="Open in new tab"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              Abrir en pestaña nueva
+              Open in new tab
             </Button>
           </div>
 
-          {/* Botón de descarga */}
+          {/* Download button */}
           {onDownload && (
             <Button
               variant="outline"
               size="sm"
               onClick={onDownload}
-              title="Descargar archivo"
+              title="Download file"
             >
               <Download className="w-4 h-4 mr-2" />
-              Descargar
+              Download
             </Button>
           )}
         </div>
 
-        {/* Área de visualización del PDF con iframe */}
-        <div className="flex-1 relative bg-gray-100">
+        {/* PDF iframe */}
+        <div className="flex-1 relative bg-gray-100 overflow-hidden min-h-0">
           {!fileUrl ? (
             <div className="flex items-center justify-center h-full text-center text-gray-500 p-8">
               <div>
                 <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p>No se ha proporcionado un archivo para previsualizar</p>
+                <p>No file available for preview</p>
               </div>
             </div>
           ) : (
             <>
-              {/* Indicador de carga */}
+              {/* Loading state */}
               {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
                   <div className="text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" />
-                    <p className="text-gray-600">Cargando PDF...</p>
+                    <p className="text-gray-600">Loading PDF…</p>
                   </div>
                 </div>
               )}
 
-              {/*
-                Iframe para mostrar el PDF
-                El navegador maneja toda la visualización, zoom, scroll, etc.
-                Esto muestra el PDF exactamente como se vería si lo abrieras directamente
-              */}
               <iframe
                 src={fileUrl}
                 className="w-full h-full border-0"
-                title={`Vista previa de ${fileName}`}
+                title={`Preview of ${fileName}`}
                 onLoad={handleIframeLoad}
-                style={{ minHeight: '600px' }}
               />
             </>
           )}
         </div>
-
-        {/* Footer con información */}
-        <div className="px-6 py-3 border-t bg-gray-50 text-xs text-gray-500 text-center">
-          {fileName}
-        </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
