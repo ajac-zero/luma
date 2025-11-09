@@ -13,6 +13,15 @@
       "pattern": "^\\d{2}-\\d{7}$"
     },
     {
+      "name": "calendar_year",
+      "type": "integer",
+      "description": "Calendar year for which the data is reported",
+      "required": true,
+      "min_value": null,
+      "max_value": null,
+      "pattern": null
+    },
+    {
       "name": "legal_name",
       "type": "string",
       "description": "Official registered name of the organization",

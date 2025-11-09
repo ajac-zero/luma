@@ -300,3 +300,424 @@ $20
 extraction_timestamp
 $26
 2025-11-08T16:17:31.137820
+*2
+$6
+SELECT
+$1
+0
+*14
+$4
+HSET
+$44
+extracted_doc:doc:01K9MH40SHHNWXNGAP4MDX6HZF
+$2
+pk
+$26
+01K9MH40SHHNWXNGAP4MDX6HZF
+$9
+file_name
+$21
+tax_year_2019_990.pdf
+$4
+tema
+$4
+ABBY
+$15
+collection_name
+$4
+ABBY
+$19
+extracted_data_json
+$4954
+{
+  "ein": "31-0329725",
+  "legal_name": "Abbey Credit Union Inc",
+  "phone_number": "937-898-7800",
+  "website_url": "www.abbeycu.com",
+  "return_type": "990",
+  "amended_return": "",
+  "group_exemption_number": "",
+  "subsection_code": "501(c)(14)",
+  "ruling_date": "",
+  "accounting_method": "Accrual",
+  "organization_type": "Corporation",
+  "year_of_formation": "1937",
+  "incorporation_state": "OH",
+  "total_revenue": 4659611,
+  "contributions_gifts_grants": 0,
+  "program_service_revenue": 4114069,
+  "membership_dues": 0,
+  "investment_income": 545542,
+  "gains_losses_sales_assets": 0,
+  "rental_income": 6725,
+  "related_organizations_revenue": 0,
+  "gaming_revenue": 0,
+  "other_revenue": 0,
+  "government_grants": 0,
+  "foreign_contributions": 0,
+  "total_expenses": 4159254,
+  "program_services_expenses": 0,
+  "management_general_expenses": 0,
+  "fundraising_expenses": 0,
+  "grants_us_organizations": 0,
+  "grants_us_individuals": 0,
+  "grants_foreign_organizations": 0,
+  "grants_foreign_individuals": 0,
+  "compensation_officers": 338208,
+  "compensation_other_staff": 1018956,
+  "payroll_taxes_benefits": 309032,
+  "professional_fees": 34366,
+  "office_occupancy_costs": 0,
+  "information_technology_costs": 0,
+  "travel_conference_expenses": 0,
+  "depreciation_amortization": 0,
+  "insurance": 0,
+  "officers_list": [
+    "Michael Thein, Chairman",
+    "Nancy Wood, Vice Chairman",
+    "Steve Wilmoth, Treasurer",
+    "Julie Trick, Secretary",
+    "Michele Blake, Board Member",
+    "Cheryl Saunders, Board Member",
+    "Heather Scaggs-Richardson, Board Member",
+    "Dean Pielemeier, CEO",
+    "Teri Puthoff, VP of Finance",
+    "Blanca Ortiz, VP of Business Development"
+  ],
+  "governing_body_size": 7,
+  "independent_members": 7,
+  "financial_statements_reviewed": "Yes",
+  "form_990_provided_to_governing_body": "Yes",
+  "conflict_of_interest_policy": "Yes",
+  "whistleblower_policy": "Yes",
+  "document_retention_policy": "Yes",
+  "ceo_compensation_review_process": "Compensation for Dean Pielemeier, CEO is reviewed by the Personnel Committee of the board of directors and is acted upon by the board of directors per committee recommendation Compensation for officers is determined by Dean Pielemeier, CEO",
+  "public_disclosure_practices": "Documents are not made available to the public",
+  "program_accomplishments_list": [
+    "Our mission is to help our members improve their economic well-being and quality of life by being competitive, convenient, and cutting edge",
+    "LENDING - ABBEY PROVIDES PERSONAL, VEHICLE, MORTGAGE, AND CREDIT CARD LOANS TO ITS MEMBERS.",
+    "FINANCIAL SERVICES - ABBEY PROVIDES CHECKING ACCOUNTS, SAVINGS ACCOUNTS, MONEY MARKET ACCOUNTS"
+  ],
+  "total_fundraising_event_revenue": 0,
+  "total_fundraising_event_expenses": 0,
+  "professional_fundraiser_fees": 0,
+  "number_of_employees": 36,
+  "number_of_volunteers": 7,
+  "occupancy_costs": 0,
+  "fundraising_method_descriptions": "",
+  "joint_ventures_disregarded_entities": "",
+  "base_compensation": 154796,
+  "bonus": 6409,
+  "incentive": 0,
+  "other_compensation": 4642,
+  "non_fixed_compensation": "",
+  "first_class_travel": "",
+  "housing_allowance": "",
+  "expense_account_usage": "",
+  "supplemental_retirement": "Yes",
+  "lobbying_expenditures_direct": 0,
+  "lobbying_expenditures_grassroots": 0,
+  "election_501h_status": "",
+  "political_campaign_expenditures": 0,
+  "related_organizations_affiliates": "",
+  "investment_types": "",
+  "donor_restricted_endowment_values": 0,
+  "net_appreciation_depreciation": 281072,
+  "related_organization_transactions": "",
+  "loans_to_from_related_parties": "LYNN COOK, PRIOR CEO, LIFE INSURAN, Loan from organization, $140,000 balance due",
+  "penalties_excise_taxes_reported": "",
+  "unrelated_business_income_disclosure": "Yes",
+  "foreign_bank_account_reporting": "No",
+  "schedule_o_narrative_explanations": "Our mission is to help our members improve their economic well-being and quality of life by being competitive, convenient, and cutting edge. Membership to Abbey is open to those who live, work, or worship, or attend school in Montgomery, Miami, Shelby, Darke, or Greene counties. Abbey Credit Union is owned by these people that open an account at Abbey CU. Yes - Each member gets one vote at the annual election. Yes - Pursuant to the regulation of the Ohio Division of Credit Unions. The VP of Finance prepared the Form 990 based on financial records Financial statements are audited annually The CEO reviews the returns prior to filing. The Credit Union has a written conflict of interest policy that states that board members are responsible for disclosing possible conflicts of interest as they arise This is reviewed annually. Compensation for Dean Pielemeier, CEO is reviewed by the Personnel Committee of the board of directors and is acted upon by the board of directors per committee recommendation Compensation for officers is determined by Dean Pielemeier, CEO."
+}
+$20
+extraction_timestamp
+$26
+2025-11-09T14:42:59.494840
+*10
+$4
+HSET
+$56
+:app.models.dataroom.DataRoom:01K9MNBVRY6KVF4XCK70JF70T0
+$2
+pk
+$26
+01K9MNBVRY6KVF4XCK70JF70T0
+$4
+name
+$5
+ABBEY
+$10
+collection
+$5
+abbey
+$7
+storage
+$5
+abbey
+*14
+$4
+HSET
+$44
+extracted_doc:doc:01K9MNMNYH1MYP0TQ5SWZRS5BG
+$2
+pk
+$26
+01K9MNMNYH1MYP0TQ5SWZRS5BG
+$9
+file_name
+$21
+tax_year_2022_990.pdf
+$4
+tema
+$5
+ABBEY
+$15
+collection_name
+$5
+ABBEY
+$19
+extracted_data_json
+$5525
+{
+  "ein": "31-0329725",
+  "calendar_year": 2022,
+  "legal_name": "0220 ABBEY CREDIT UNION INC",
+  "phone_number": "(397) 898-7800",
+  "website_url": "www.abbeycu.com",
+  "return_type": "990",
+  "amended_return": "",
+  "group_exemption_number": "",
+  "subsection_code": "501(c)(14)",
+  "ruling_date": "",
+  "accounting_method": "Accrual",
+  "organization_type": "Corporation",
+  "year_of_formation": "1937",
+  "incorporation_state": "OH",
+  "total_revenue": 6146738,
+  "contributions_gifts_grants": 0,
+  "program_service_revenue": 5656278,
+  "membership_dues": 0,
+  "investment_income": 490460,
+  "gains_losses_sales_assets": 0,
+  "rental_income": 0,
+  "related_organizations_revenue": 0,
+  "gaming_revenue": 0,
+  "other_revenue": 0,
+  "government_grants": 0,
+  "foreign_contributions": 0,
+  "total_expenses": 5526970,
+  "program_services_expenses": 386454,
+  "management_general_expenses": 5140516,
+  "fundraising_expenses": 0,
+  "grants_us_organizations": 0,
+  "grants_us_individuals": 0,
+  "grants_foreign_organizations": 0,
+  "grants_foreign_individuals": 0,
+  "compensation_officers": 629393,
+  "compensation_other_staff": 1329887,
+  "payroll_taxes_benefits": 452511,
+  "professional_fees": 96462,
+  "office_occupancy_costs": 292244,
+  "information_technology_costs": 287125,
+  "travel_conference_expenses": 26662,
+  "depreciation_amortization": 236836,
+  "insurance": 39570,
+  "officers_list": [
+    "Lisa Burk, Chief Experience Officer, 40.00 hrs/wk, Officer, $73,286 compensation, $8,931 other compensation",
+    "Eric Stetzel, VP of Business Services, 40.00 hrs/wk, Key employee, $111,064 compensation, $15,979 other compensation",
+    "Dean Pielemeier, CEO, 40.00 hrs/wk, Officer, $212,994 compensation, $20,202 other compensation",
+    "Blanca Criner, Chief Marketing and Business Development Officer, 40.00 hrs/wk, Officer, $121,036 compensation, $4,540 other compensation",
+    "Teri Puthoff, CFO, 40.00 hrs/wk, Officer, $120,962 compensation, $15,754 other compensation",
+    "Michael Thein, Chairman, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Latham Farley, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Steve Wilmoth, Treasurer, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Julie Trick, Secretary, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Michele Blake, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Cheryl Saunders, Board Member, 1.00 hrs/wk, Individual trustee or director, $0 compensation",
+    "Heather Scaggs-Richardson, Vice Chairman, 1.00 hrs/wk, Individual trustee or director, $0 compensation"
+  ],
+  "governing_body_size": 7,
+  "independent_members": 7,
+  "financial_statements_reviewed": "No",
+  "form_990_provided_to_governing_body": "Yes",
+  "conflict_of_interest_policy": "Yes",
+  "whistleblower_policy": "Yes",
+  "document_retention_policy": "Yes",
+  "ceo_compensation_review_process": "Approval of Compensation Committee and Board of Directors",
+  "public_disclosure_practices": "Audited financial statements are handed out each year at the annual meeting. Other documents are not made available to the public unless requested.",
+  "program_accomplishments_list": [
+    "Abbey provides checking savings accounts money market accounts certificates of deposit and IRAs. Abbey also offers free atm debit card services wire transfer services mobile banking and insurance related products.",
+    "Abbey provides personal vehicle mortgage and credit card loans to its members."
+  ],
+  "total_fundraising_event_revenue": 0,
+  "total_fundraising_event_expenses": 0,
+  "professional_fundraiser_fees": 0,
+  "number_of_employees": 50,
+  "number_of_volunteers": 7,
+  "occupancy_costs": 132399,
+  "fundraising_method_descriptions": "",
+  "joint_ventures_disregarded_entities": "",
+  "base_compensation": 544779,
+  "bonus": 34315,
+  "incentive": 59692,
+  "other_compensation": 0,
+  "non_fixed_compensation": "",
+  "first_class_travel": "No",
+  "housing_allowance": "No",
+  "expense_account_usage": "No",
+  "supplemental_retirement": "No",
+  "lobbying_expenditures_direct": 0,
+  "lobbying_expenditures_grassroots": 0,
+  "election_501h_status": "",
+  "political_campaign_expenditures": 0,
+  "related_organizations_affiliates": "",
+  "investment_types": "Publicly traded securities",
+  "donor_restricted_endowment_values": 0,
+  "net_appreciation_depreciation": -2190939,
+  "related_organization_transactions": "",
+  "loans_to_from_related_parties": "Lynn Cook (Retired CEO) and Dean Pielemeier (CEO) received life insurance loans from the organization, each with a balance due of $1,400,000 and $1,239,997 respectively.",
+  "penalties_excise_taxes_reported": "No",
+  "unrelated_business_income_disclosure": "Yes",
+  "foreign_bank_account_reporting": "No",
+  "schedule_o_narrative_explanations": "Membership to Abbey is open to those who live work worship or attend school in Montgomery Miami Shelby Darke or Greene counties. Abbey CU is owned by the people who open a savings account at Abbey CU. Each member has one vote at the annual election of the Board of Directors. Decisions that require their approval: Ohio Division of Financial Institutions Pursuant to regulation. CFO prepares the form and CEO reviews before submitting. Approval of Compensation Committee and Board of Directors for CEO compensation. Audited financial statements are handed out each year at the annual meeting. Other documents are not made available to the public unless requested."
+}
+$20
+extraction_timestamp
+$26
+2025-11-09T16:01:59.759953
+*14
+$4
+HSET
+$44
+extracted_doc:doc:01K9MP8DBNWMRH9A966RRJ4E7V
+$2
+pk
+$26
+01K9MP8DBNWMRH9A966RRJ4E7V
+$9
+file_name
+$21
+tax_year_2019_990.pdf
+$4
+tema
+$5
+ABBEY
+$15
+collection_name
+$5
+ABBEY
+$19
+extracted_data_json
+$4959
+{
+  "ein": "31-0329725",
+  "calendar_year": 2019,
+  "legal_name": "Abbey Credit Union Inc",
+  "phone_number": "937-898-7800",
+  "website_url": "www.abbeycu.com",
+  "return_type": "990",
+  "amended_return": "",
+  "group_exemption_number": "",
+  "subsection_code": "501(c)(14)",
+  "ruling_date": "",
+  "accounting_method": "Accrual",
+  "organization_type": "Corporation",
+  "year_of_formation": "1937",
+  "incorporation_state": "OH",
+  "total_revenue": 4659611,
+  "contributions_gifts_grants": 0,
+  "program_service_revenue": 4114069,
+  "membership_dues": 0,
+  "investment_income": 545542,
+  "gains_losses_sales_assets": 0,
+  "rental_income": 6725,
+  "related_organizations_revenue": 0,
+  "gaming_revenue": 0,
+  "other_revenue": 0,
+  "government_grants": 0,
+  "foreign_contributions": 0,
+  "total_expenses": 4159254,
+  "program_services_expenses": 0,
+  "management_general_expenses": 0,
+  "fundraising_expenses": 0,
+  "grants_us_organizations": 0,
+  "grants_us_individuals": 0,
+  "grants_foreign_organizations": 0,
+  "grants_foreign_individuals": 0,
+  "compensation_officers": 338208,
+  "compensation_other_staff": 1018956,
+  "payroll_taxes_benefits": 273057,
+  "professional_fees": 34366,
+  "office_occupancy_costs": 200152,
+  "information_technology_costs": 0,
+  "travel_conference_expenses": 46563,
+  "depreciation_amortization": 0,
+  "insurance": 0,
+  "officers_list": {
+    "value": [
+      "Michael Thein, Chairman",
+      "Nancy Wood, Vice Chairman",
+      "Steve Wilmoth, Treasurer",
+      "Julie Trick, Secretary",
+      "Michele Blake, Board Member",
+      "Cheryl Saunders, Board Member",
+      "Heather Scaggs-Richardson, Board Member",
+      "Dean Pielemeier, CEO",
+      "Teri Puthoff, VP of Finance",
+      "Blanca Ortiz, VP of Business Development"
+    ],
+    "chunk_references": []
+  },
+  "governing_body_size": 7,
+  "independent_members": 7,
+  "financial_statements_reviewed": "Yes",
+  "form_990_provided_to_governing_body": "Yes",
+  "conflict_of_interest_policy": "Yes",
+  "whistleblower_policy": "Yes",
+  "document_retention_policy": "Yes",
+  "ceo_compensation_review_process": "Compensation for Dean Pielemeier, CEO is reviewed by the Personnel Committee of the board of directors and is acted upon by the board of directors per committee recommendation.",
+  "public_disclosure_practices": "Documents are not made available to the public",
+  "program_accomplishments_list": {
+    "value": [
+      "LENDING - ABBEY PROVIDES PERSONAL, VEHICLE, MORTGAGE, AND CREDIT CARD LOANS TO ITS MEMBERS.",
+      "FINANCIAL SERVICES - ABBEY PROVIDES CHECKING ACCOUNTS, SAVINGS ACCOUNTS, MONEY MARKET ACCOUNTS, ..."
+    ],
+    "chunk_references": []
+  },
+  "total_fundraising_event_revenue": 0,
+  "total_fundraising_event_expenses": 0,
+  "professional_fundraiser_fees": 0,
+  "number_of_employees": 36,
+  "number_of_volunteers": 7,
+  "occupancy_costs": 87912,
+  "fundraising_method_descriptions": "",
+  "joint_ventures_disregarded_entities": "",
+  "base_compensation": 154796,
+  "bonus": 6409,
+  "incentive": 0,
+  "other_compensation": 4642,
+  "non_fixed_compensation": "",
+  "first_class_travel": "",
+  "housing_allowance": "",
+  "expense_account_usage": "",
+  "supplemental_retirement": "Yes",
+  "lobbying_expenditures_direct": 0,
+  "lobbying_expenditures_grassroots": 0,
+  "election_501h_status": "",
+  "political_campaign_expenditures": 0,
+  "related_organizations_affiliates": "",
+  "investment_types": "",
+  "donor_restricted_endowment_values": 0,
+  "net_appreciation_depreciation": 281072,
+  "related_organization_transactions": "",
+  "loans_to_from_related_parties": "Loans to prior CEO Lynn Cook for life insurance, $1,400,000 total outstanding.",
+  "penalties_excise_taxes_reported": "",
+  "unrelated_business_income_disclosure": "Yes",
+  "foreign_bank_account_reporting": "No",
+  "schedule_o_narrative_explanations": "Our mission is to help our members improve their economic well-being and quality of life by being competitive, convenient, and cutting edge. Membership to Abbey is open to those who live, work, or worship, or attend school in Montgomery, Miami, Shelby, Darke, or Greene counties. Abbey Credit Union is owned by these people that open an account at Abbey CU. Yes - Each member gets one vote at the annual election. Yes - Pursuant to the regulation of the Ohio Division of Credit Unions. The VP of Finance prepared the Form 990 based on financial records. Financial statements are audited annually. The CEO reviews the returns prior to filing. The Credit Union has a written conflict of interest policy that states that board members are responsible for disclosing possible conflicts of interest as they arise. This is reviewed annually. Compensation for Dean Pielemeier, CEO is reviewed by the Personnel Committee of the board of directors and is acted upon by the board of directors per committee recommendation. Compensation for officers is determined by Dean Pielemeier, CEO. Documents are not made available to the public."
+}
+$20
+extraction_timestamp
+$26
+2025-11-09T16:12:46.318554

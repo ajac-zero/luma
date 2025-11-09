@@ -106,6 +106,11 @@ class CoreOrganizationMetadata(BaseModel):
     incorporation_state: str = Field(
         ..., description="State of incorporation.", title="Incorporation State"
     )
+    calendar_year: str | None = Field(
+        default=None,
+        description="Calendar year covered by the return (if different from fiscal year).",
+        title="Calendar Year",
+    )
 
 
 class RevenueBreakdown(BaseModel):
@@ -579,6 +584,7 @@ def _transform_flat_payload(data: dict[str, Any]) -> dict[str, Any]:
             "organization_type": get_str("organization_type"),
             "year_of_formation": get_str("year_of_formation"),
             "incorporation_state": get_str("incorporation_state"),
+            "calendar_year": get_str("calendar_year"),
         },
         "revenue_breakdown": {
             "total_revenue": get_value("total_revenue"),

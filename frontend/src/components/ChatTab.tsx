@@ -29,6 +29,7 @@ import {
   User,
 } from "lucide-react";
 import { AuditReport } from "./AuditReport";
+import { AnalystReport } from "./AnalystReport";
 import { WebSearchResults } from "./WebSearchResults";
 import { Loader } from "@/components/ai-elements/loader";
 import { DefaultChatTransport } from "ai";
@@ -234,6 +235,51 @@ export function ChatTab({ selectedTema }: ChatTabProps) {
                               <AlertCircle className="w-4 h-4 text-red-600" />
                               <span className="text-sm font-medium text-red-800">
                                 Error generando reporte de auditoría
+                              </span>
+                            </div>
+                            <p className="text-sm text-red-600 mt-1">
+                              {part.errorText}
+                            </p>
+                          </div>
+                        );
+                      default:
+                        return null;
+                    }
+                  case "tool-build_analysis_report":
+                    switch (part.state) {
+                      case "input-available":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="flex items-center gap-2 p-4 bg-purple-50 rounded-lg border border-purple-200"
+                          >
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                            <span className="text-sm text-purple-700">
+                              Generando análisis histórico...
+                            </span>
+                          </div>
+                        );
+                      case "output-available":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="mt-4 w-full"
+                          >
+                            <div className="max-w-full overflow-hidden">
+                              <AnalystReport data={part.output} />
+                            </div>
+                          </div>
+                        );
+                      case "output-error":
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-red-600" />
+                              <span className="text-sm font-medium text-red-800">
+                                Error generando análisis histórico
                               </span>
                             </div>
                             <p className="text-sm text-red-600 mt-1">
