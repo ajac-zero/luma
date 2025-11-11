@@ -1,6 +1,20 @@
-# Luma - AI-Powered Document Management & Analysis Platform
+# Luma - AI-Powered Nonprofit Financial Intelligence
+
+> Transforming millions of nonprofit tax filings into actionable insights — in hours, not weeks.
 
 A full-stack application that combines intelligent document processing, vector search, and AI-powered analysis with a modern React frontend and FastAPI backend.
+
+# The Problem
+
+Every year, over 1.5 million U.S. nonprofits file IRS Form 990s — creating thousands of pages of critical financial and governance data.
+
+While this information is technically public, it remains practically unusable for most professionals who need it.
+
+Financial advisors, auditors, and philanthropic donors need quick access to reliable nonprofit data to make informed decisions.
+
+Manual review is time-consuming, error-prone, and doesn't scale — leaving critical insights buried in paperwork.
+
+Luma turns raw filings into actionable insights, powering smarter, faster, and more transparent decisions across the nonprofit sector.
 
 ## 🚀 Features
 
